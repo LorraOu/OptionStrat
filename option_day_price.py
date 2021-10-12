@@ -16,12 +16,14 @@ for root,dirs,files in walk('/home/user/NasHistoricData/Option'):
     for f in files:
         if 'TXO' in f:
             code = f.split('.')[0]
-            price = int(code[3:8])
-            month = int(info_df.loc[code[8],'expiry_month'])
-            tpe = info_df.loc[code[8],'type']
-            year = int('202'+code[9])
-            monthcal = c.monthdatescalendar(year,month)
-            third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == month][2]
-            exp_date = datetime.strftime(third_wed,'%Y%m%d')
-            option_df = option_df.append({'Code':code,'Type':tpe,'Execution_price':price,'Expiry_date':exp_date},ignore_index=True)
+            if code not in list(option_df['Code']):
+                print(code)
+                price = int(code[3:8])
+                month = int(info_df.loc[code[8],'expiry_month'])
+                tpe = info_df.loc[code[8],'type']
+                year = int('202'+code[9])
+                monthcal = c.monthdatescalendar(year,month)
+                third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == month][2]
+                exp_date = datetime.strftime(third_wed,'%Y%m%d')
+                option_df = option_df.append({'Code':code,'Type':tpe,'Execution_price':price,'Expiry_date':exp_date},ignore_index=True)
 option_df.to_csv(in_path+'/options.csv',index=False)
