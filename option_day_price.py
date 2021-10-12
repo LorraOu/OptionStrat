@@ -12,7 +12,7 @@ info_df = info_df.set_index('code')
 
 c = calendar.Calendar(firstweekday=calendar.SUNDAY)
 option_df = pd.DataFrame(columns=['Code','Type','Execution_price','Expiry_date'])
-for root,dirs,files in walk('/home/user/NasHistoricData/Option'):
+for root,dirs,files in walk('/home/user/NasHistoryData/Option'):
     for f in files:
         if 'TXO' in f:
             code = f.split('.')[0]
