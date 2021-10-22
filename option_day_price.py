@@ -2,7 +2,8 @@ import pandas as pd
 from os import walk, path, mkdir
 from os.path import join
 import calendar
-from datetime import datetime
+from datetime import datetime as dt
+import datetime
 import pathlib
 import csv
 import os
@@ -31,7 +32,7 @@ def option_code():
                     year = int('202'+code[9])
                     monthcal = c.monthdatescalendar(year,month)
                     third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == month][2]
-                    exp_date = datetime.strftime(third_wed,'%Y%m%d')
+                    exp_date = dt.strftime(third_wed,'%Y%m%d')
                     with open(in_path + '/options.csv', "a") as csvfile:
                         spamwriter = csv.writer(csvfile, delimiter=',')
                         spamwriter.writerow([code,tpe,price,exp_date])
@@ -50,10 +51,10 @@ def future_day_price():
     for root,dirs,files in walk('/home/user/NasHistoryData/FutureCT'):
         for d in dirs:
             if len(d) == 8:
-                dir_list.append(datetime.strptime(d,'%Y%m%d'))
+                dir_list.append(dt.strptime(d,'%Y%m%d'))
     for d in dir_list:
         if d >= datetime.date(2021,9,15) and d <= datetime.date(2021,10,20):
-            date = datetime.strftime(d,'%Y%m%d')
+            date = dt.strftime(d,'%Y%m%d')
             path = f'/home/user/NasHistoryData/FutureCT/{date}/{code}.csv'
             if os.path.isfile(path):
                 df1 = pd.read_csv(path)
