@@ -53,7 +53,7 @@ def future_day_price():
             if len(d) == 8:
                 dir_list.append(dt.strptime(d,'%Y%m%d'))
     for d in dir_list:
-        if d >= datetime.date(2021,9,15) and d <= datetime.date(2021,10,20):
+        if d >= datetime.datetime(2021,9,15) and d <= datetime.datetime(2021,10,20):
             date = dt.strftime(d,'%Y%m%d')
             path = f'/home/user/NasHistoryData/FutureCT/{date}/{code}.csv'
             if os.path.isfile(path):
