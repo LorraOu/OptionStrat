@@ -24,9 +24,12 @@ def future_day_price():
         monthcal = c.monthdatescalendar(d.year,d.month)
         third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == d.month][2]
         if d.day > third_wed.day:
-            code ='TXF{}{}'.format(info_df.loc[d.month+1,'code'],'1') #換月
+            if d.month == 12:
+                code ='TXF{}{}'.format(info_df.loc[1,'code'],str(d.year+1)[3]) #換月
+            else:
+                code ='TXF{}{}'.format(info_df.loc[d.month+1,'code'],str(d.year)[3])
         else:
-            code ='TXF{}{}'.format(info_df.loc[d.month,'code'],'1') #使用結算日當天契約價格當作現貨價格
+            code ='TXF{}{}'.format(info_df.loc[d.month,'code'],str(d.year)[3]) #使用結算日當天契約價格當作現貨價格
         with open(out_path + f'/{code[:-2]}.csv', "w") as csvfile:
             spamwriter = csv.writer(csvfile, delimiter=',')
             spamwriter.writerow(['Date','Open','High','Low','Close'])
