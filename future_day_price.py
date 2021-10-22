@@ -68,9 +68,15 @@ def hist_vol():
     code = 'TXF'
     in_path = '/home/user/Future_OHLC/'+f'{code}.csv'
     fut_df = pd.read_csv(in_path)
-    fut_df['r_hl_2'] = (math.log(fut_df['High'])/math.log(fut_df['High']))^2
-    fut_df['his_vol'] = math.sqrt(fut_df['r_hl_2'].rolling(15).sum()/(60*math.log(2)))
-    fut_df.to_csv(in_path)
+    for i in range(len(fut_df)):
+        value = fut_df.iloc[i]
+        fut_df.loc[i,'r_hl_2'] = math.pow((math.log(value[2])/math.log(value[3])),2)
+    fut_df['sum_r'] = fut_df['r_hl_2'].rolling(15).sum()
+    for i in range(len(fut_df)):
+        value = fut_df.iloc[i]
+        fut_df.loc[i,'hist_vol'] = math.sqrt(value[6]/(60*math.log(2)))
+    fut_df = fut_df.drop(['r_hl_2','sum_r'],axis=1)
+    fut_df.to_csv(in_path,index=False)
 
 # option_df.to_csv(in_path+'/options.csv',index=False)
 if __name__ == '__main__':
