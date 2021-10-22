@@ -18,7 +18,7 @@ def option_code():
     info_df = info_df.set_index('code')
     code_list = []
     option_df = pd.DataFrame(columns=['Code','Type','Execution_price','Expiry_date'])
-    for root,dirs,files in walk('/home/NasHistoryData/OptionCT'):
+    for root,dirs,files in walk('/home/user/NasHistoryData/OptionCT'):
         for f in files:
             if 'TXO' in f:
                 code = f.split('.')[0]
@@ -37,7 +37,7 @@ def option_code():
                         spamwriter.writerow([code,tpe,price,exp_date])
                     option_df = option_df.append({'Code':code,'Type':tpe,'Execution_price':price,'Expiry_date':exp_date},ignore_index=True)
 def future_day_price():
-    out_path = '/home/Future_OHLC'
+    out_path = '/home/user/Future_OHLC'
     info_list = {'code': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'], 'expiry_month': ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']}
     info_df = pd.DataFrame(info_list)
     info_df = info_df.set_index('expiry_month')
@@ -47,14 +47,14 @@ def future_day_price():
         spamwriter = csv.writer(csvfile, delimiter=',')
         spamwriter.writerow(['Date','Open','High','Low','Close'])
     dir_list = []
-    for root,dirs,files in walk('/home/NasHistoryData/FutureCT'):
+    for root,dirs,files in walk('/home/user/NasHistoryData/FutureCT'):
         for d in dirs:
             if len(d) == 8:
                 dir_list.append(datetime.strptime(d,'%Y%m%d'))
     for d in dir_list:
         if d >= datetime.date(2021,9,15) and d <= datetime.date(2021,10,20):
             date = datetime.strftime(d,'%Y%m%d')
-            path = f'/home/NasHistoryData/FutureCT/{date}/{code}.csv'
+            path = f'/home/user/NasHistoryData/FutureCT/{date}/{code}.csv'
             if os.path.isfile(path):
                 df1 = pd.read_csv(path)
                 opn = 0
