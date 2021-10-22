@@ -66,7 +66,7 @@ def future_day_price():
 def hist_vol():
     import math
     code = 'TXF'
-    in_path = '/home/user/Future_OHLC'+f'{code}.csv'
+    in_path = '/home/user/Future_OHLC/'+f'{code}.csv'
     fut_df = pd.read_csv(in_path)
     fut_df['r_hl_2'] = (math.log(fut_df['High'])/math.log(fut_df['High']))^2
     fut_df['his_vol'] = math.sqrt(fut_df['r_hl_2'].rolling(15).sum()/(60*math.log(2)))
@@ -74,5 +74,5 @@ def hist_vol():
 
 # option_df.to_csv(in_path+'/options.csv',index=False)
 if __name__ == '__main__':
-    future_day_price()
+    # future_day_price()
     hist_vol()
