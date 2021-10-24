@@ -77,6 +77,9 @@ if __name__ == '__main__':
                                 fut_code ='{}{}{}'.format(fut,info_df.loc[d.month+1,'code'],str(d.year)[3])
                         else:
                             fut_code ='{}{}{}'.format(fut,info_df.loc[d.month,'code'],str(d.year)[3])
+                        if not os.path.isfile(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv'):
+                            print('for option',opt_code + ',','future price data is missing.')
+                            continue
                         fut_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
                         fut_his_v = pd.read_csv(f'/home/user/Future_OHLC/{fut}.csv')
                         fut_his_v = fut_his_v.set_index('Date')
