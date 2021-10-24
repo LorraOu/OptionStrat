@@ -15,6 +15,7 @@ with open(in_path + '/options.csv', "w") as csvfile:
 info_list = {'code': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X'], 'type': ['call', 'call', 'call', 'call', 'call', 'call', 'call', 'call', 'call', 'call', 'call', 'call', 'put', 'put', 'put', 'put', 'put', 'put', 'put', 'put', 'put', 'put', 'put', 'put'], 'expiry_month': ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']}
 c = calendar.Calendar(firstweekday=calendar.SUNDAY)
 def option_code():
+    print('Processing option basic information data...')
     info_df = pd.DataFrame(info_list)
     info_df = info_df.set_index('code')
     code_list = []
@@ -37,5 +38,6 @@ def option_code():
                         spamwriter = csv.writer(csvfile, delimiter=',')
                         spamwriter.writerow([code,tpe,price,exp_date])
                     option_df = option_df.append({'Code':code,'Type':tpe,'Execution_price':price,'Expiry_date':exp_date},ignore_index=True)
-if __name__ == '__main__':
-    option_code()
+    return option_df
+# if __name__ == '__main__':
+#     option_code()

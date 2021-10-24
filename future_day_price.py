@@ -3,12 +3,14 @@ from os import walk, path, mkdir
 from os.path import join
 import calendar
 from datetime import datetime as dt
+import datetime
 import pathlib
 import csv
 import os
 in_path = str(pathlib.Path(__file__).parent.absolute())
 
 def future_day_price():
+    print('Processing future daily price data...')
     out_path = '/home/user/Future_OHLC'
     info_list = {'code': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'], 'expiry_month': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
     info_df = pd.DataFrame(info_list)
@@ -21,48 +23,56 @@ def future_day_price():
                 dir_list.append(dt.strptime(d,'%Y%m%d'))
     fut_list = ['TXF']
     for fut in fut_list:
-        with open(out_path + f'/{fut}.csv', "w") as csvfile:
-            spamwriter = csv.writer(csvfile, delimiter=',')
-            spamwriter.writerow(['Date','Open','High','Low','Close'])
+        #從之前的檔案列出最後更新日期
+        if  not os.path.isfile(out_path + f'/{fut}.csv'):
+            with open(out_path + f'/{fut}.csv', "w") as csvfile:
+                spamwriter = csv.writer(csvfile, delimiter=',')
+                spamwriter.writerow(['Date','Open','High','Low','Close'])
+            last_date = datetime.datetime(1999,1,1)
+        else:
+            in_path = '/home/user/Future_OHLC/'+f'{fut}.csv'
+            fut_df = pd.read_csv(in_path)
+            last_date = dt.strptime(fut_df.loc[len(fut_df)-1,'Date'],'%Y%m%d')
         for d in dir_list:
-            c = calendar.Calendar(firstweekday=calendar.SUNDAY)
-            monthcal = c.monthdatescalendar(d.year,d.month)
-            third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == d.month][2]
-            if d.day > third_wed.day:
-                if d.month == 12:
-                    code ='{}{}{}'.format(fut,info_df.loc[1,'code'],str(d.year+1)[3]) #換月
+            if d > last_date:
+                c = calendar.Calendar(firstweekday=calendar.SUNDAY)
+                monthcal = c.monthdatescalendar(d.year,d.month)
+                third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == d.month][2]
+                if d.day > third_wed.day:
+                    if d.month == 12:
+                        code ='{}{}{}'.format(fut,info_df.loc[1,'code'],str(d.year+1)[3]) #換月
+                    else:
+                        code ='{}{}{}'.format(fut,info_df.loc[d.month+1,'code'],str(d.year)[3])
                 else:
-                    code ='{}{}{}'.format(fut,info_df.loc[d.month+1,'code'],str(d.year)[3])
-            else:
-                code ='{}{}{}'.format(fut,info_df.loc[d.month,'code'],str(d.year)[3]) #使用結算日當天契約價格當作現貨價格
-            date = dt.strftime(d,'%Y%m%d')
-            path = f'/home/user/NasHistoryData/FutureCT/{date}/{code}.csv'
-            if os.path.isfile(path):
-                df1 = pd.read_csv(path)
-                opn = 0
-                high = 0
-                low = 0
-                close = 0
-                first_trade = 0
-                for i in range(0,len(df1),60):
-                    value = df1.iloc[i]
-                    if opn == 0:
-                        if value[1] != 0 and first_trade == 0:
-                            opn = value[1]
-                            first_trade = 1
+                    code ='{}{}{}'.format(fut,info_df.loc[d.month,'code'],str(d.year)[3]) #使用結算日當天契約價格當作現貨價格
+                date = dt.strftime(d,'%Y%m%d')
+                path = f'/home/user/NasHistoryData/FutureCT/{date}/{code}.csv'
+                if os.path.isfile(path):
+                    df1 = pd.read_csv(path)
+                    opn = 0
+                    high = 0
+                    low = 0
+                    close = 0
+                    first_trade = 0
+                    for i in range(0,len(df1),60):
+                        value = df1.iloc[i]
+                        if opn == 0:
+                            if value[1] != 0 and first_trade == 0:
+                                opn = value[1]
+                                first_trade = 1
+                                high = value[1]
+                                low = value[1]
+                        if value[1] > high:
                             high = value[1]
+                        elif value[1] < low and value[1] != 0:
                             low = value[1]
-                    if value[1] > high:
-                        high = value[1]
-                    elif value[1] < low and value[1] != 0:
-                        low = value[1]
-                    if value[1] != 0:
-                        last = value[1]
-                close = last
-                with open(out_path + f'/{fut}.csv', "a") as csvfile:
-                    spamwriter = csv.writer(csvfile, delimiter=',')
-                    spamwriter.writerow([date,opn,high,low,close])
-                print(date,opn,high,low,close)
+                        if value[1] != 0:
+                            last = value[1]
+                    close = last
+                    with open(out_path + f'/{fut}.csv', "a") as csvfile:
+                        spamwriter = csv.writer(csvfile, delimiter=',')
+                        spamwriter.writerow([date,opn,high,low,close])
+                    print(date,opn,high,low,close)
 def hist_vol():
     import math
     code = 'TXF'
@@ -79,6 +89,6 @@ def hist_vol():
     fut_df.to_csv(in_path,index=False)
 
 # option_df.to_csv(in_path+'/options.csv',index=False)
-if __name__ == '__main__':
-    # future_day_price()
-    hist_vol()
+# if __name__ == '__main__':
+#     future_day_price()
+#     hist_vol()
