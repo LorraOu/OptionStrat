@@ -9,7 +9,7 @@ import csv
 import os
 
 in_path = str(pathlib.Path(__file__).parent.absolute())
-if os.isfile(in_path + '/options.csv'):
+if os.path.isfile(in_path + '/options.csv'):
     df1 = pd.read_csv(in_path + '/options.csv')
     code_list = list(df1['Code'])
 else:
