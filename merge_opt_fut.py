@@ -26,7 +26,6 @@ def BS_put(S0,K,T,r,v):   ##  BS Put Option value
     return p_value
 
 if __name__ == '__main__':
-    print('merging future and option price data...')
     # 分析選擇權代碼
     option_list.option_code()
     if os.path.isfile(in_path + '/options.csv'):
@@ -41,6 +40,7 @@ if __name__ == '__main__':
     future_day_price.future_day_price()
     future_day_price.hist_vol()
 
+    print('merging future and option price data...')
     #merge選擇權資料和現貨價格
     info_list = {'code': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'], 'expiry_month': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
     info_df = pd.DataFrame(info_list)
@@ -62,7 +62,7 @@ if __name__ == '__main__':
                         opt_code = f.split('.')[0]
                         # get k and delivery date
                         opt_crnt = option_df.loc[opt_code]
-                        opt_df = pd.read_csv(opt_path + f'/{opt_code}.csv')
+                        opt_df = pd.read_csv(opt_path + f'/{date}/{opt_code}.csv')
                         # 先做call option
                         if opt_crnt[0] == 'put':
                             continue
