@@ -32,7 +32,8 @@ def future_day_price():
         else:
             in_path = '/home/user/Future_OHLC/'+f'{fut}.csv'
             fut_df = pd.read_csv(in_path)
-            last_date = dt.strptime(fut_df.loc[len(fut_df)-1,'Date'],'%Y%m%d')
+            l_d = str(fut_df.loc[len(fut_df)-1,'Date'])
+            last_date = dt.strptime(l_d,'%Y%m%d')
         for d in dir_list:
             if d > last_date:
                 c = calendar.Calendar(firstweekday=calendar.SUNDAY)
