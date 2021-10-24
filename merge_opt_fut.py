@@ -103,7 +103,7 @@ if __name__ == '__main__':
                         ='Time').fillna(method='ffill')
                         merge_df = merge_df[merge_df.Last !=0]
                         merge_df['K'] = opt_crnt[1]
-                        t_delta = dt.strptime(opt_crnt[2],'%Y%m%d') - d
+                        t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
                         merge_df['T'] = t_delta.days/360
                         merge_df['sigma'] = fut_his_v.loc[date]
                         for i in range(len(merge_df)):
