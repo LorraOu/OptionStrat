@@ -55,6 +55,8 @@ if __name__ == '__main__':
     for opt in opt_list:
         fut = 'TXF'
         for d in dir_list:
+            if d != dt.strptime('20201222','%Y%m%d'):
+                continue
             date = dt.strftime(d,'%Y%m%d')
             for root,dirs,files in walk(f'/home/user/NasHistoryData/OptionCT/{date}'):
                 for f in files:
