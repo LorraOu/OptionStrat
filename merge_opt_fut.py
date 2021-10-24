@@ -8,6 +8,11 @@ import os
 from os import walk
 import numpy as np
 from scipy import stats
+import pathlib
+
+#current file location
+in_path = str(pathlib.Path(__file__).parent.absolute())
+
 def BS_call(S0,K,T,r,v):  ##  BS Call Option value
     d1 = (np.log(S0/K) + (r + 0.5*v**2)*T ) / (v*np.sqrt(T))
     d2 = d1 - (v*np.sqrt(T))
@@ -21,10 +26,16 @@ def BS_put(S0,K,T,r,v):   ##  BS Put Option value
     return p_value
 
 if __name__ == '__main__':
+    print('merging future and option price data...')
     # 分析選擇權代碼
-    option_df = pd.DataFrame()
-    option_df = option_list.option_code()
-    option_df = option_df.set_index('Code')
+    option_list.option_code()
+    if os.path.isfile(in_path + '/options.csv'):
+        option_df = pd.read_csv()
+        option_df = option_df.set_index('Code')
+    else:
+        print('error: file options.csv not found.')
+        print('program closing...')
+        exit(1)
 
     #更新期貨資料和歷史波動度
     future_day_price.future_day_price()
