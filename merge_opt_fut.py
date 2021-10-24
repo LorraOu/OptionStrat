@@ -83,7 +83,7 @@ if __name__ == '__main__':
                             print('for option',opt_code + ',','future price data is missing.')
                             continue
                         fut_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
-                        fut_his_v = pd.read_csv(f'/home/user/Future_OHLC/{fut}.csv')
+                        fut_his_v = pd.read_csv(f'/home/user/Future_OHLC/{fut}.csv',dtype={"Date": str})
                         fut_his_v = fut_his_v.set_index('Date')
                         #merge option and future price; record future prrice every 60 ticks
                         step = 60
@@ -105,7 +105,7 @@ if __name__ == '__main__':
                         merge_df['K'] = opt_crnt[1]
                         t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
                         merge_df['T'] = t_delta.days/360
-                        merge_df['sigma'] = fut_his_v.loc[date]
+                        merge_df['sigma'] = fut_his_v.loc[date,'hist_vol']
                         for i in range(len(merge_df)):
                             value = merge_df.iloc[i]
                             merge_df.iloc[i]['Option_Price'] = BS_call(value[2],value[3],value[4],0.03,value[5])
