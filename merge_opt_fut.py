@@ -30,7 +30,7 @@ if __name__ == '__main__':
     # 分析選擇權代碼
     option_list.option_code()
     if os.path.isfile(in_path + '/options.csv'):
-        option_df = pd.read_csv()
+        option_df = pd.read_csv(in_path + '/options.csv')
         option_df = option_df.set_index('Code')
     else:
         print('error: file options.csv not found.')
