@@ -99,10 +99,9 @@ if __name__ == '__main__':
                             'ASKSZ2', 'ASK3', 'ASKSZ3', 'ASK4', 'ASKSZ4', 'ASK5', 'ASKSZ5', 'Tick',
                             'Volume', 'LastTime'],axis=1)
                         fut_df_60 = fut_df_60.rename(columns={'Last':'Future_last'})
-                        merge_df = opt_df.merge(fut_df_60,how='outer',on
-                        ='Time').fillna(method='ffill')
-                        na_rows = merge_df['Last'] !=0 and merge_df['Future_last'] != 0
-                        merge_df = merge_df[merge_df[na_rows]]
+                        merge_df = opt_df.merge(fut_df_60,how='outer',on='Time').fillna(method='ffill')
+                        merge_df = merge_df[merge_df['Last'] !=0]
+                        merge_df = merge_df[merge_df['Future_last'] != 0]
                         merge_df['K'] = opt_crnt[1]
                         t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
                         merge_df['T'] = t_delta.days/360
