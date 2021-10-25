@@ -69,8 +69,8 @@ if __name__ == '__main__':
                         opt_crnt = option_df.loc[opt_code]
                         opt_df = pd.read_csv(opt_path + f'/{date}/{opt_code}.csv')
                         # 先做call option
-                        if opt_crnt[0] == 'put':
-                            continue
+                        # if opt_crnt[0] == 'put':
+                        #     continue
                         # import corresponding future price information and historical volatility
                         c = calendar.Calendar(firstweekday=calendar.SUNDAY)
                         monthcal = c.monthdatescalendar(d.year,d.month)
@@ -116,28 +116,27 @@ if __name__ == '__main__':
                         for i in range(len(merge_df)):
                             value = merge_df.iloc[i]
                             merge_df.loc[i,'Option_Price'] = BS_call(value[2],value[3],value[4],0.03,value[5])
-                        if len(merge_df) > 0:
-                            # output merge file
-                            output_folder = '/home/user/Option_val'
-                            try:
-                                if os.path.isdir(output_folder):
-                                    print('Folder exist: ' + output_folder)
-                                else:
-                                    print('Create folder: ' + output_folder)
-                                    os.mkdir(output_folder)
-                            except OSError:
-                                print('Creation of the directory {} failed'.format(output_folder))
-                                exit(1)
-                            output_folder = output_folder + f'/{date}'
-                            try:
-                                if os.path.isdir(output_folder):
-                                    print('Folder exist: ' + output_folder)
-                                else:
-                                    print('Create folder: ' + output_folder)
-                                    os.mkdir(output_folder)
-                            except OSError:
-                                print('Creation of the directory {} failed'.format(output_folder))
-                                exit(1)
-                            output_path = output_folder + f'/{opt_code}.csv'
-                            merge_df.to_csv(output_path,index=False)
-                            print('Output:',output_path)
+                        # output merge file
+                        output_folder = '/home/user/Option_val'
+                        try:
+                            if os.path.isdir(output_folder):
+                                print('Folder exist: ' + output_folder)
+                            else:
+                                print('Create folder: ' + output_folder)
+                                os.mkdir(output_folder)
+                        except OSError:
+                            print('Creation of the directory {} failed'.format(output_folder))
+                            exit(1)
+                        output_folder = output_folder + f'/{date}'
+                        try:
+                            if os.path.isdir(output_folder):
+                                print('Folder exist: ' + output_folder)
+                            else:
+                                print('Create folder: ' + output_folder)
+                                os.mkdir(output_folder)
+                        except OSError:
+                            print('Creation of the directory {} failed'.format(output_folder))
+                            exit(1)
+                        output_path = output_folder + f'/{opt_code}.csv'
+                        merge_df.to_csv(output_path,index=False)
+                        print('Output:',output_path)
