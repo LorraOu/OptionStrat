@@ -101,36 +101,37 @@ if __name__ == '__main__':
                         fut_df_60 = fut_df_60.rename(columns={'Last':'Future_last'})
                         merge_df = opt_df.merge(fut_df_60,how='outer',on
                         ='Time').fillna(method='ffill')
-                        merge_df = merge_df[merge_df.Last !=0]
+                        merge_df = merge_df[merge_df.Last !=0 and merge_df.Future_last != 0]
                         merge_df['K'] = opt_crnt[1]
                         t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
                         merge_df['T'] = t_delta.days/360
                         merge_df['sigma'] = fut_his_v.loc[date,'hist_vol']
+                        merge_df = merge_df.reset_index(drop=True)
                         for i in range(len(merge_df)):
                             value = merge_df.iloc[i]
-                            merge_df.iloc[i]['Option_Price'] = BS_call(value[2],value[3],value[4],0.03,value[5])
-
-                        # output merge file
-                        output_folder = '/home/user/Option_val'
-                        try:
-                            if os.path.isdir(output_folder):
-                                print('Folder exist: ' + output_folder)
-                            else:
-                                print('Create folder: ' + output_folder)
-                                os.mkdir(output_folder)
-                        except OSError:
-                            print('Creation of the directory {} failed'.format(output_folder))
-                            exit(1)
-                        output_folder = output_folder + f'/{date}'
-                        try:
-                            if os.path.isdir(output_folder):
-                                print('Folder exist: ' + output_folder)
-                            else:
-                                print('Create folder: ' + output_folder)
-                                os.mkdir(output_folder)
-                        except OSError:
-                            print('Creation of the directory {} failed'.format(output_folder))
-                            exit(1)
-                        output_path = output_folder + f'{opt_code}.csv'
-                        merge_df.to_csv(output_path)
-                        print('Output:',output_folder)
+                            merge_df.loc[i,'Option_Price'] = BS_call(value[2],value[3],value[4],0.03,value[5])
+                        if len(merge_df) > 0:
+                            # output merge file
+                            output_folder = '/home/user/Option_val'
+                            try:
+                                if os.path.isdir(output_folder):
+                                    print('Folder exist: ' + output_folder)
+                                else:
+                                    print('Create folder: ' + output_folder)
+                                    os.mkdir(output_folder)
+                            except OSError:
+                                print('Creation of the directory {} failed'.format(output_folder))
+                                exit(1)
+                            output_folder = output_folder + f'/{date}'
+                            try:
+                                if os.path.isdir(output_folder):
+                                    print('Folder exist: ' + output_folder)
+                                else:
+                                    print('Create folder: ' + output_folder)
+                                    os.mkdir(output_folder)
+                            except OSError:
+                                print('Creation of the directory {} failed'.format(output_folder))
+                                exit(1)
+                            output_path = output_folder + f'/{opt_code}.csv'
+                            merge_df.to_csv(output_path,index=False)
+                            print('Output:',output_path)
