@@ -9,9 +9,14 @@ from os import walk
 import numpy as np
 from scipy import stats
 import pathlib
+import csv
 
 #current file location
 in_path = str(pathlib.Path(__file__).parent.absolute())
+if not os.path.isfile(in_path + '/future_missing.csv'):
+    with open(in_path + '/future_missing.csv', "w") as csvfile:
+        spamwriter = csv.writer(csvfile, delimiter=',')
+        spamwriter.writerow(['Date','Option_code','Future_contact'])
 
 def BS_call(S0,K,T,r,v):  ##  BS Call Option value
     d1 = (np.log(S0/K) + (r + 0.5*v**2)*T ) / (v*np.sqrt(T))
@@ -55,8 +60,6 @@ if __name__ == '__main__':
     for opt in opt_list:
         fut = 'TXF'
         for d in dir_list:
-            if d != dt.strptime('20201222','%Y%m%d'):
-                continue
             date = dt.strftime(d,'%Y%m%d')
             for root,dirs,files in walk(f'/home/user/NasHistoryData/OptionCT/{date}'):
                 for f in files:
@@ -81,6 +84,9 @@ if __name__ == '__main__':
                             fut_code ='{}{}{}'.format(fut,info_df.loc[d.month,'code'],str(d.year)[3])
                         if not os.path.isfile(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv'):
                             print('for option',opt_code + ',','future price data is missing.')
+                            with open(in_path + '/future_missing.csv', "w") as csvfile:
+                                spamwriter = csv.writer(csvfile, delimiter=',')
+                                spamwriter.writerow([date,opt_code,fut_code])
                             continue
                         fut_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
                         fut_his_v = pd.read_csv(f'/home/user/Future_OHLC/{fut}.csv',dtype={"Date": str})
