@@ -51,16 +51,23 @@ if __name__ == '__main__':
     info_df = pd.DataFrame(info_list)
     info_df = info_df.set_index('expiry_month')
     opt_path = '/home/user/NasHistoryData/OptionCT'
+    existed = []
     dir_list = []
     for root,dirs,files in walk('/home/user/NasHistoryData/OptionCT'):
         for d in dirs:
             if len(d) == 8:
                 dir_list.append(dt.strptime(d,'%Y%m%d'))
+    for root,dirs,files in walk('/home/user/Naspublic/Option_Data/Price'):
+        for d in dirs:
+            if len(d) == 8:
+                existed.append(d)
     opt_list = ['TXO']
     for opt in opt_list:
         fut = 'TXF'
         for d in dir_list:
             date = dt.strftime(d,'%Y%m%d')
+            if date in existed:
+                continue
             for root,dirs,files in walk(f'/home/user/NasHistoryData/OptionCT/{date}'):
                 for f in files:
                     if opt in f:
@@ -68,6 +75,9 @@ if __name__ == '__main__':
                         # get k and delivery date
                         opt_crnt = option_df.loc[opt_code]
                         opt_df = pd.read_csv(opt_path + f'/{date}/{opt_code}.csv')
+                        opt_last = pd.read_csv(opt_path + f'/{opt_crnt[2]}/{opt_code}.csv')
+                        opt_last = opt_last[opt_last.last !=0]
+                        clearing_price = opt_last.tail(1)['Last'].values[0]
                         # 先做call option
                         # if opt_crnt[0] == 'put':
                         #     continue
@@ -102,12 +112,13 @@ if __name__ == '__main__':
                             'Volume', 'LastTime'],axis=1)
                         opt_df = opt_df.drop(['Vol', 'BID1', 'BIDSZ1', 'BID2', 'BIDSZ2', 'BID3',
                             'BIDSZ3', 'BID4', 'BIDSZ4', 'BID5', 'BIDSZ5', 'ASK1', 'ASKSZ1', 'ASK2',
-                            'ASKSZ2', 'ASK3', 'ASKSZ3', 'ASK4', 'ASKSZ4', 'ASK5', 'ASKSZ5', 'Tick',
+                            'ASKSZ2', 'ASK3', 'ASKSZ3', 'ASK4', 'ASKSZ4', 'ASK5', 'ASKSZ5',
                             'Volume', 'LastTime'],axis=1)
                         fut_df_60 = fut_df_60.rename(columns={'Last':'Future_last'})
                         merge_df = opt_df.merge(fut_df_60,how='outer',on='Time').fillna(method='ffill')
                         merge_df = merge_df[merge_df['Last'] !=0]
                         merge_df = merge_df[merge_df['Future_last'] != 0]
+                        merge_df = merge_df[merge_df['Tick'] != 0]
                         merge_df['K'] = opt_crnt[1]
                         t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
                         merge_df['T'] = t_delta.days/360
@@ -115,9 +126,15 @@ if __name__ == '__main__':
                         merge_df = merge_df.reset_index(drop=True)
                         for i in range(len(merge_df)):
                             value = merge_df.iloc[i]
-                            merge_df.loc[i,'Option_Price'] = BS_call(value[2],value[3],value[4],0.03,value[5])
+                            if opt_crnt[0] == 'call':
+                                merge_df.loc[i,'Option_Price'] = BS_call(value[2],value[3],value[4],0.03,value[5])
+                            else:
+                                merge_df.loc[i,'Option_Price'] = BS_put(value[2],value[3],value[4],0.03,value[5])
+                        merge_df['Clearing_price'] = clearing_price
+                        merge_df['Last-Clearing'] = merge_df['Last'] - merge_df['Clearing_price']
+                        merge_df['Option_Price-Clearing'] = merge_df['Option_Price'] - merge_df['Clearing_price']
                         # output merge file
-                        output_folder = '/home/user/Option_val'
+                        output_folder = '/home/user/Naspublic/Option_Data/Price'
                         try:
                             if os.path.isdir(output_folder):
                                 print('Folder exist: ' + output_folder)
