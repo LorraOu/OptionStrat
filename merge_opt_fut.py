@@ -106,8 +106,8 @@ if __name__ == '__main__':
                         fut_df_60 = pd.DataFrame(columns=fut_df.columns)
                         for i in range(0,len(fut_df),step):
                             fut_df_60 = fut_df_60.append(fut_df.iloc[i],ignore_index=True)
-                        fut_df_60 = fut_df_60.drop(['Vol', 'BID1', 'BIDSZ1', 'BID2', 'BIDSZ2', 'BID3',
-                            'BIDSZ3', 'BID4', 'BIDSZ4', 'BID5', 'BIDSZ5', 'ASK1', 'ASKSZ1', 'ASK2',
+                        fut_df_60 = fut_df_60.drop(['Vol','BIDSZ1', 'BID2', 'BIDSZ2', 'BID3',
+                            'BIDSZ3', 'BID4', 'BIDSZ4', 'BID5', 'BIDSZ5', 'ASKSZ1', 'ASK2',
                             'ASKSZ2', 'ASK3', 'ASKSZ3', 'ASK4', 'ASKSZ4', 'ASK5', 'ASKSZ5', 'Tick',
                             'Volume', 'LastTime'],axis=1)
                         opt_df = opt_df.drop(['Vol', 'BID1', 'BIDSZ1', 'BID2', 'BIDSZ2', 'BID3',
@@ -134,7 +134,7 @@ if __name__ == '__main__':
                         merge_df['Last-Clearing'] = merge_df['Last'] - merge_df['Clearing_price']
                         merge_df['Option_Price-Clearing'] = merge_df['Option_Price'] - merge_df['Clearing_price']
                         # output merge file
-                        output_folder = '/home/user/Naspublic/Option_Data/Price'
+                        output_folder = '/home/user/NasPublic/Option_Data/Price'
                         try:
                             if os.path.isdir(output_folder):
                                 print('Folder exist: ' + output_folder)
