@@ -76,7 +76,7 @@ if __name__ == '__main__':
                         opt_crnt = option_df.loc[opt_code]
                         opt_df = pd.read_csv(opt_path + f'/{date}/{opt_code}.csv')
                         opt_last = pd.read_csv(opt_path + f'/{opt_crnt[2]}/{opt_code}.csv')
-                        opt_last = opt_last[opt_last.last !=0]
+                        opt_last = opt_last[opt_last['Last'] !=0]
                         clearing_price = opt_last.tail(1)['Last'].values[0]
                         # 先做call option
                         # if opt_crnt[0] == 'put':
