@@ -139,7 +139,8 @@ if __name__ == '__main__':
                                 merge_df.loc[i,'Option_Price'] = BS_call(value[2],value[3],value[4],0.03,value[5])
                             else:
                                 merge_df.loc[i,'Option_Price'] = BS_put(value[2],value[3],value[4],0.03,value[5])
-                        print(merge_df)
+                        if len(merge_df) == 0:
+                            continue
                         merge_df['Clearing_price'] = clearing_price
                         merge_df['Last-Clearing'] = merge_df['Last'] - merge_df['Clearing_price']
                         merge_df['Option_Price-Clearing'] = merge_df['Option_Price'] - merge_df['Clearing_price']
