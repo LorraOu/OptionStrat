@@ -35,7 +35,7 @@ def BS_put(S0,K,T,r,v):   ##  BS Put Option value
 
 if __name__ == '__main__':
     # 分析選擇權代碼
-    option_list.option_code()
+    # option_list.option_code()
     if os.path.isfile(in_path + '/options.csv'):
         option_df = pd.read_csv(in_path + '/options.csv')
         option_df = option_df.set_index('Code')
@@ -45,8 +45,8 @@ if __name__ == '__main__':
         exit(1)
 
     #更新期貨資料和歷史波動度
-    future_day_price.future_day_price()
-    future_day_price.hist_vol()
+    # future_day_price.future_day_price()
+    # future_day_price.hist_vol()
 
     print('merging future and option price data...')
     #merge選擇權資料和現貨價格
@@ -88,8 +88,8 @@ if __name__ == '__main__':
                                 opt_crnt[2] = dt.strftime(dt.strptime(str(opt_crnt[2]),'%Y%m%d') - timedelta(days=1),'%Y%m%d')
 
                         # 先做call option
-                        # if opt_crnt[0] == 'put':
-                        #     continue
+                        if opt_crnt[0] == 'put':
+                            continue
                         # import corresponding future price information and historical volatility
                         c = calendar.Calendar(firstweekday=calendar.SUNDAY)
                         monthcal = c.monthdatescalendar(d.year,d.month)
@@ -139,6 +139,7 @@ if __name__ == '__main__':
                                 merge_df.loc[i,'Option_Price'] = BS_call(value[2],value[3],value[4],0.03,value[5])
                             else:
                                 merge_df.loc[i,'Option_Price'] = BS_put(value[2],value[3],value[4],0.03,value[5])
+                        print(merge_df)
                         merge_df['Clearing_price'] = clearing_price
                         merge_df['Last-Clearing'] = merge_df['Last'] - merge_df['Clearing_price']
                         merge_df['Option_Price-Clearing'] = merge_df['Option_Price'] - merge_df['Clearing_price']
