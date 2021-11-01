@@ -10,7 +10,7 @@ import calendar
 import os
 from os import walk
 import numpy as np
-from scipy import stats
+from scipy import stats as si
 import pathlib
 import csv
 
@@ -24,14 +24,63 @@ if not os.path.isfile(in_path + '/future_missing.csv'):
 def BS_call(S0,K,T,r,v):  ##  BS Call Option value
     d1 = (np.log(S0/K) + (r + 0.5*v**2)*T ) / (v*np.sqrt(T))
     d2 = d1 - (v*np.sqrt(T))
-    c_value =S0*stats.norm.cdf(d1) - K * np.exp(-r*T)*stats.norm.cdf(d2)
+    c_value =S0*si.norm.cdf(d1) - K * np.exp(-r*T)*si.norm.cdf(d2)
     return c_value
 
 def BS_put(S0,K,T,r,v):   ##  BS Put Option value
     d1 = (np.log(S0/K) + (r + 0.5*v**2)*T ) / (v*np.sqrt(T))
     d2 = d1 - (v*np.sqrt(T))
-    p_value = K * np.exp(-r*T)*stats.norm.cdf(-d2) -  S0*stats.norm.cdf(-d1) 
+    p_value = K * np.exp(-r*T)*si.norm.cdf(-d2) -  S0*si.norm.cdf(-d1) 
     return p_value
+
+def newton_vol_call(S, K, T, C, r, sigma):
+    
+    #S: spot price
+    #K: strike price
+    #T: time to maturity
+    #C: Call value
+    #r: interest rate
+    #sigma: volatility of underlying asset
+    
+    d1 = (np.log(S / K) + (r - 0.5 * sigma ** 2) * T) / (sigma * np.sqrt(T))
+    d2 = (np.log(S / K) + (r - 0.5 * sigma ** 2) * T) / (sigma * np.sqrt(T))
+    
+    fx = S * si.norm.cdf(d1, 0.0, 1.0) - K * np.exp(-r * T) * si.norm.cdf(d2, 0.0, 1.0) - C
+    
+    vega = (1 / np.sqrt(2 * np.pi)) * S * np.sqrt(T) * np.exp(-(si.norm.cdf(d1, 0.0, 1.0) ** 2) * 0.5)
+    
+    tolerance = 0.000001
+    x0 = sigma
+    xnew  = x0
+    xold = x0 - 1
+        
+    while abs(xnew - xold) > tolerance:
+    
+        xold = xnew
+        xnew = (xnew - fx - C) / vega
+        
+    return abs(xnew)
+
+def newton_vol_put(S, K, T, P, r, sigma):
+    
+    d1 = (np.log(S / K) + (r - 0.5 * sigma ** 2) * T) / (sigma * np.sqrt(T))
+    d2 = (np.log(S / K) + (r - 0.5 * sigma ** 2) * T) / (sigma * np.sqrt(T))
+    
+    fx = K * np.exp(-r * T) * si.norm.cdf(-d2, 0.0, 1.0) - S * si.norm.cdf(-d1, 0.0, 1.0) - P
+    
+    vega = (1 / np.sqrt(2 * np.pi)) * S * np.sqrt(T) * np.exp(-(si.norm.cdf(d1, 0.0, 1.0) ** 2) * 0.5)
+    
+    tolerance = 0.000001
+    x0 = sigma
+    xnew  = x0
+    xold = x0 - 1
+        
+    while abs(xnew - xold) > tolerance:
+    
+        xold = xnew
+        xnew = (xnew - fx - P) / vega
+        
+    return abs(xnew)
 
 if __name__ == '__main__':
     # 分析選擇權代碼
@@ -74,19 +123,25 @@ if __name__ == '__main__':
             for root,dirs,files in walk(f'/home/user/NasHistoryData/OptionCT/{date}'):
                 for f in files:
                     if opt in f:
+                        print('Processing option')
                         opt_code = f.split('.')[0]
                         # get k and delivery date
                         opt_crnt = option_df.loc[opt_code]
                         opt_df = pd.read_csv(opt_path + f'/{date}/{opt_code}.csv')
-                        while True:
+
+                        c = 0
+                        while c < 5:
                             try:
+                                c+=1
                                 opt_last = pd.read_csv(opt_path + f'/{opt_crnt[2]}/{opt_code}.csv')
                                 opt_last = opt_last[opt_last['Last'] !=0]
                                 clearing_price = opt_last.tail(1)['Last'].values[0]
                                 break
                             except:
                                 opt_crnt[2] = dt.strftime(dt.strptime(str(opt_crnt[2]),'%Y%m%d') - timedelta(days=1),'%Y%m%d')
-
+                        if c == 5:
+                            print('Clearing price not found')
+                            continue
                         # 先做call option
                         if opt_crnt[0] == 'put':
                             continue
@@ -144,6 +199,8 @@ if __name__ == '__main__':
                         merge_df['Clearing_price'] = clearing_price
                         merge_df['Last-Clearing'] = merge_df['Last'] - merge_df['Clearing_price']
                         merge_df['Option_Price-Clearing'] = merge_df['Option_Price'] - merge_df['Clearing_price']
+                        merge_df['S'] = (merge_df['BID1'] + merge_df['ASK1'])/2
+
                         # output merge file
                         output_folder = '/home/user/NasPublic/Option_Data/Price'
                         try:
