@@ -1,8 +1,10 @@
+import datetime
 import option_list
 import future_day_price
 import option_list
 import pandas as pd
 from datetime import datetime as dt
+from datetime import timedelta
 import calendar
 import os
 from os import walk
@@ -75,6 +77,8 @@ if __name__ == '__main__':
                         # get k and delivery date
                         opt_crnt = option_df.loc[opt_code]
                         opt_df = pd.read_csv(opt_path + f'/{date}/{opt_code}.csv')
+                        while not os.path.isfile(opt_path + f'/{opt_crnt[2]}/{opt_code}.csv'):
+                            opt_crnt[2] = dt.strftime(dt.strptime(opt_crnt[2],'%Y%m%d') - timedelta(days=1),'%Y%m%d')
                         opt_last = pd.read_csv(opt_path + f'/{opt_crnt[2]}/{opt_code}.csv')
                         opt_last = opt_last[opt_last['Last'] !=0]
                         clearing_price = opt_last.tail(1)['Last'].values[0]
@@ -101,7 +105,7 @@ if __name__ == '__main__':
                         fut_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
                         fut_his_v = pd.read_csv(f'/home/user/Future_OHLC/{fut}.csv',dtype={"Date": str})
                         fut_his_v = fut_his_v.set_index('Date')
-                        #merge option and future price; record future prrice every 60 ticks
+                        #merge option and future price; record future price every 60 ticks
                         step = 60
                         fut_df_60 = pd.DataFrame(columns=fut_df.columns)
                         for i in range(0,len(fut_df),step):
