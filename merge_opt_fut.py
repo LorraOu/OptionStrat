@@ -13,6 +13,9 @@ import numpy as np
 from scipy import stats as si
 import pathlib
 import csv
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 
 #current file location
 in_path = str(pathlib.Path(__file__).parent.absolute())
@@ -33,24 +36,24 @@ def BS_put(S0,K,T,r,v):   ##  BS Put Option value
     p_value = K * np.exp(-r*T)*si.norm.cdf(-d2) -  S0*si.norm.cdf(-d1) 
     return p_value
 
-def newton_vol_call(S, K, T, C, r, sigma):
+def newton_vol_call(S, K, T, C, r, v):
     
     #S: spot price
     #K: strike price
     #T: time to maturity
     #C: Call value
     #r: interest rate
-    #sigma: volatility of underlying asset
+    #v: volatility of underlying asset
     
-    d1 = (np.log(S / K) + (r - 0.5 * sigma ** 2) * T) / (sigma * np.sqrt(T))
-    d2 = (np.log(S / K) + (r - 0.5 * sigma ** 2) * T) / (sigma * np.sqrt(T))
+    d1 = (np.log(S / K) + (r - 0.5 * v ** 2) * T) / (v * np.sqrt(T))
+    d2 = (np.log(S / K) + (r - 0.5 * v ** 2) * T) / (v * np.sqrt(T))
     
     fx = S * si.norm.cdf(d1, 0.0, 1.0) - K * np.exp(-r * T) * si.norm.cdf(d2, 0.0, 1.0) - C
     
     vega = (1 / np.sqrt(2 * np.pi)) * S * np.sqrt(T) * np.exp(-(si.norm.cdf(d1, 0.0, 1.0) ** 2) * 0.5)
     
     tolerance = 0.000001
-    x0 = sigma
+    x0 = v
     xnew  = x0
     xold = x0 - 1
         
@@ -61,17 +64,17 @@ def newton_vol_call(S, K, T, C, r, sigma):
         
     return abs(xnew)
 
-def newton_vol_put(S, K, T, P, r, sigma):
+def newton_vol_put(S, K, T, P, r, v):
     
-    d1 = (np.log(S / K) + (r - 0.5 * sigma ** 2) * T) / (sigma * np.sqrt(T))
-    d2 = (np.log(S / K) + (r - 0.5 * sigma ** 2) * T) / (sigma * np.sqrt(T))
+    d1 = (np.log(S / K) + (r - 0.5 * v ** 2) * T) / (v * np.sqrt(T))
+    d2 = (np.log(S / K) + (r - 0.5 * v ** 2) * T) / (v * np.sqrt(T))
     
     fx = K * np.exp(-r * T) * si.norm.cdf(-d2, 0.0, 1.0) - S * si.norm.cdf(-d1, 0.0, 1.0) - P
     
     vega = (1 / np.sqrt(2 * np.pi)) * S * np.sqrt(T) * np.exp(-(si.norm.cdf(d1, 0.0, 1.0) ** 2) * 0.5)
     
     tolerance = 0.000001
-    x0 = sigma
+    x0 = v
     xnew  = x0
     xold = x0 - 1
         
@@ -186,21 +189,23 @@ if __name__ == '__main__':
                         merge_df['K'] = opt_crnt[1]
                         t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
                         merge_df['T'] = t_delta.days/360
-                        merge_df['sigma'] = fut_his_v.loc[date,'hist_vol']
+                        merge_df['V'] = fut_his_v.loc[date,'hist_vol']
+                        merge_df['S'] = (merge_df['BID1'] + merge_df['ASK1'])/2
                         merge_df = merge_df.reset_index(drop=True)
                         for i in range(len(merge_df)):
                             value = merge_df.iloc[i]
                             if opt_crnt[0] == 'call':
                                 merge_df.loc[i,'Option_Price'] = BS_call(value[2],value[3],value[4],0.03,value[5])
+                                merge_df.loc[i,'Implied_Volatility'] = newton_vol_call(value[6],value[3],value[4],merge_df.loc[i,'Option_Price'],0.03,value[5])
                             else:
                                 merge_df.loc[i,'Option_Price'] = BS_put(value[2],value[3],value[4],0.03,value[5])
+                                merge_df.loc[i,'Implied_Volatility'] = newton_vol_put(value[6],value[3],value[4],merge_df.loc[i,'Option_Price'],0.03,value[5])
                         if len(merge_df) == 0:
                             continue
                         merge_df['Clearing_price'] = clearing_price
                         merge_df['Last-Clearing'] = merge_df['Last'] - merge_df['Clearing_price']
                         merge_df['Option_Price-Clearing'] = merge_df['Option_Price'] - merge_df['Clearing_price']
-                        merge_df['S'] = (merge_df['BID1'] + merge_df['ASK1'])/2
-
+                        
                         # output merge file
                         output_folder = '/home/user/NasPublic/Option_Data/Price'
                         try:
