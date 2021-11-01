@@ -1,4 +1,5 @@
 import datetime
+from typing import final
 import option_list
 import future_day_price
 import option_list
@@ -77,11 +78,15 @@ if __name__ == '__main__':
                         # get k and delivery date
                         opt_crnt = option_df.loc[opt_code]
                         opt_df = pd.read_csv(opt_path + f'/{date}/{opt_code}.csv')
-                        while not os.path.isfile(opt_path + f'/{opt_crnt[2]}/{opt_code}.csv'):
-                            opt_crnt[2] = dt.strftime(dt.strptime(str(opt_crnt[2]),'%Y%m%d') - timedelta(days=1),'%Y%m%d')
-                        opt_last = pd.read_csv(opt_path + f'/{opt_crnt[2]}/{opt_code}.csv')
-                        opt_last = opt_last[opt_last['Last'] !=0]
-                        clearing_price = opt_last.tail(1)['Last'].values[0]
+                        while True:
+                            try:
+                                opt_last = pd.read_csv(opt_path + f'/{opt_crnt[2]}/{opt_code}.csv')
+                                opt_last = opt_last[opt_last['Last'] !=0]
+                                clearing_price = opt_last.tail(1)['Last'].values[0]
+                                break
+                            except:
+                                opt_crnt[2] = dt.strftime(dt.strptime(str(opt_crnt[2]),'%Y%m%d') - timedelta(days=1),'%Y%m%d')
+
                         # 先做call option
                         # if opt_crnt[0] == 'put':
                         #     continue
