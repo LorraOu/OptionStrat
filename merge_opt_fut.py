@@ -78,7 +78,7 @@ if __name__ == '__main__':
                         opt_crnt = option_df.loc[opt_code]
                         opt_df = pd.read_csv(opt_path + f'/{date}/{opt_code}.csv')
                         while not os.path.isfile(opt_path + f'/{opt_crnt[2]}/{opt_code}.csv'):
-                            opt_crnt[2] = dt.strftime(dt.strptime(opt_crnt[2],'%Y%m%d') - timedelta(days=1),'%Y%m%d')
+                            opt_crnt[2] = dt.strftime(dt.strptime(str(opt_crnt[2]),'%Y%m%d') - timedelta(days=1),'%Y%m%d')
                         opt_last = pd.read_csv(opt_path + f'/{opt_crnt[2]}/{opt_code}.csv')
                         opt_last = opt_last[opt_last['Last'] !=0]
                         clearing_price = opt_last.tail(1)['Last'].values[0]
