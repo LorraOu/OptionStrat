@@ -195,11 +195,11 @@ if __name__ == '__main__':
                         for i in range(len(merge_df)):
                             value = merge_df.iloc[i]
                             if opt_crnt[0] == 'call':
-                                merge_df.loc[i,'Option_Price'] = BS_call(value[2],value[3],value[4],0.03,value[5])
-                                merge_df.loc[i,'Implied_Volatility'] = newton_vol_call(value[6],value[3],value[4],merge_df.loc[i,'Option_Price'],0.03,value[5])
+                                merge_df.loc[i,'Option_Price'] = BS_call(value[4],value[6],value[7],0.03,value[8])
+                                merge_df.loc[i,'Implied_Volatility'] = newton_vol_call(value[9],value[6],value[7],merge_df.loc[i,'Option_Price'],0.03,value[8])
                             else:
-                                merge_df.loc[i,'Option_Price'] = BS_put(value[2],value[3],value[4],0.03,value[5])
-                                merge_df.loc[i,'Implied_Volatility'] = newton_vol_put(value[6],value[3],value[4],merge_df.loc[i,'Option_Price'],0.03,value[5])
+                                merge_df.loc[i,'Option_Price'] = BS_put(value[4],value[6],value[7],0.03,value[8])
+                                merge_df.loc[i,'Implied_Volatility'] = newton_vol_put(value[9],value[6],value[7],merge_df.loc[i,'Option_Price'],0.03,value[8])
                         if len(merge_df) == 0:
                             continue
                         merge_df['Clearing_price'] = clearing_price
