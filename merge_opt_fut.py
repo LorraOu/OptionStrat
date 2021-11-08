@@ -48,7 +48,6 @@ def newton_vol_call(S, K, T, C, r, v):
     sigma = v
     last_sig = v
     while True:
-        print(sigma)
         fx = BS_call(S, K, T, r, sigma) - C
         if fx > 0:
             last_sig  = sigma
@@ -69,7 +68,6 @@ def newton_vol_put(S, K, T, P, r, v):
     sigma = v
     last_sig = v
     while True:
-        print(sigma)
         fx = BS_put(S, K, T, r, sigma) - P
         if fx > 0:
             last_sig  = sigma
@@ -130,20 +128,6 @@ if __name__ == '__main__':
                         # get k and delivery date
                         opt_crnt = option_df.loc[opt_code]
                         opt_df = pd.read_csv(opt_path + f'/{date}/{opt_code}.csv')
-
-                        c = 0
-                        while c < 5:
-                            try:
-                                c+=1
-                                opt_last = pd.read_csv(opt_path + f'/{opt_crnt[2]}/{opt_code}.csv')
-                                opt_last = opt_last[opt_last['Last'] !=0]
-                                clearing_price = opt_last.tail(1)['Last'].values[0]
-                                break
-                            except:
-                                opt_crnt[2] = dt.strftime(dt.strptime(str(opt_crnt[2]),'%Y%m%d') - timedelta(days=1),'%Y%m%d')
-                        if c == 5:
-                            print('Clearing price not found')
-                            continue
                         # 先做call option
                         # if opt_crnt[0] == 'put':
                         #     continue
@@ -164,6 +148,13 @@ if __name__ == '__main__':
                                 spamwriter = csv.writer(csvfile, delimiter=',')
                                 spamwriter.writerow([date,opt_code,fut_code])
                             continue
+                        if not os.path.isfile(f'/home/user/NasHistoryData/FutureCT/{opt_crnt[2]}/{fut_code}.csv'):
+                            print('for option',opt_code + ',','future price data is missing.')
+                            continue
+                        else:
+                            settle_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
+                            settle_df = settle_df[settle_df['Tick'] != 0]
+                            final_s = settle_df.tail(1)['Last'].values(0)
                         fut_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
                         fut_his_v = pd.read_csv(f'/home/user/Future_OHLC/{fut}.csv',dtype={"Date": str})
                         fut_his_v = fut_his_v.set_index('Date')
@@ -195,13 +186,14 @@ if __name__ == '__main__':
                             value = merge_df.iloc[i]
                             if opt_crnt[0] == 'call':
                                 merge_df.loc[i,'Option_Price'] = BS_call(value[4],value[6],value[7],0.03,value[8])
+                                merge_df.loc[i,'Clearing_price'] = BS_call(final_s,value[6],value[7],0.03,value[8])
                                 merge_df.loc[i,'Implied_Volatility'] = newton_vol_call(value[9],value[6],value[7],merge_df.loc[i,'Option_Price'],0.03,value[8])
                             else:
                                 merge_df.loc[i,'Option_Price'] = BS_put(value[4],value[6],value[7],0.03,value[8])
+                                merge_df.loc[i,'Clearing_price'] = BS_put(final_s,value[6],value[7],0.03,value[8])
                                 merge_df.loc[i,'Implied_Volatility'] = newton_vol_put(value[9],value[6],value[7],merge_df.loc[i,'Option_Price'],0.03,value[8])
                         if len(merge_df) == 0:
                             continue
-                        merge_df['Clearing_price'] = clearing_price
                         merge_df['Last-Clearing'] = merge_df['Last'] - merge_df['Clearing_price']
                         merge_df['Option_Price-Clearing'] = merge_df['Option_Price'] - merge_df['Clearing_price']
                         
