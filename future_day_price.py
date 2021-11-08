@@ -99,8 +99,7 @@ def hist_vol():
         fut_df['sum_r'] = fut_df['r_hl_2'].rolling(15).sum()
         for i in range(len(fut_df)):
             value = fut_df.iloc[i]
-            fut_df.loc[i,'hist_vol']
-            math.sqrt(value[6]/(60*math.log(2)))
+            fut_df.loc[i,'hist_vol'] = math.sqrt(value[6]/(60*math.log(2)))
         fut_df = fut_df.drop(['r_hl_2','sum_r'],axis=1)
         fut_df.to_csv(in_path,index=False)
 
