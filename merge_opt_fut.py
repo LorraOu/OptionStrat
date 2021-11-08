@@ -113,9 +113,10 @@ if __name__ == '__main__':
         for d in dirs:
             if len(d) == 8:
                 existed.append(d)
-    opt_list = ['TXO']
+    opt_list = ['CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB', 'TX', 'TE', 'TF']
     for opt in opt_list:
-        fut = 'TXF'
+        fut = opt + 'F'
+        opt = opt + 'O'
         for d in dir_list:
             date = dt.strftime(d,'%Y%m%d')
             if date in existed:
