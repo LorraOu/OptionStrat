@@ -84,7 +84,7 @@ def newton_vol_put(S, K, T, P, r, v):
 
 if __name__ == '__main__':
     # 分析選擇權代碼
-    # option_list.option_code()
+    option_list.option_code()
     if os.path.isfile(in_path + '/options.csv'):
         option_df = pd.read_csv(in_path + '/options.csv')
         option_df = option_df.set_index('Code')
@@ -94,8 +94,8 @@ if __name__ == '__main__':
         exit(1)
 
     #更新期貨資料和歷史波動度
-    # future_day_price.future_day_price()
-    # future_day_price.hist_vol()
+    future_day_price.future_day_price()
+    future_day_price.hist_vol()
 
     print('merging future and option price data...')
     #merge選擇權資料和現貨價格
@@ -113,7 +113,8 @@ if __name__ == '__main__':
         for d in dirs:
             if len(d) == 8:
                 existed.append(d)
-    opt_list = ['CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB', 'TX', 'TE', 'TF']
+    # opt_list = ['CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB', 'TX', 'TE', 'TF']
+    opt_list = ['TX', 'TE', 'TF']
     for opt in opt_list:
         fut = opt + 'F'
         opt = opt + 'O'

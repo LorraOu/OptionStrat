@@ -21,8 +21,10 @@ def future_day_price():
         for d in dirs:
             if len(d) == 8:
                 dir_list.append(dt.strptime(d,'%Y%m%d'))
-    fut_list = ['TXF']
+    # fut_list = ['CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB', 'TX', 'TE', 'TF']
+    fut_list = ['TX', 'TE', 'TF']
     for fut in fut_list:
+        fut = fut + 'F'
         #從之前的檔案列出最後更新日期
         if  not os.path.isfile(out_path + f'/{fut}.csv'):
             with open(out_path + f'/{fut}.csv', "w") as csvfile:
