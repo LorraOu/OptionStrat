@@ -109,7 +109,7 @@ if __name__ == '__main__':
         for d in dirs:
             if len(d) == 8:
                 dir_list.append(dt.strptime(d,'%Y%m%d'))
-    for root,dirs,files in walk('/home/user/Naspublic/Option_Data/Price'):
+    for root,dirs,files in walk('/home/user/NasPublic/Option_Data/Price'):
         for d in dirs:
             if len(d) == 8:
                 existed.append(d)
