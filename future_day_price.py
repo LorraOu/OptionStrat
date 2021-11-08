@@ -22,7 +22,7 @@ def future_day_price():
             if len(d) == 8:
                 dir_list.append(dt.strptime(d,'%Y%m%d'))
     # fut_list = ['CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB', 'TX', 'TE', 'TF']
-    fut_list = ['CA', 'CB', 'CC']
+    fut_list = ['CA', 'CB', 'CC', 'TX']
     for fut in fut_list:
         fut = fut + 'F'
         print(fut)
@@ -80,7 +80,7 @@ def future_day_price():
 def hist_vol():
     import math
     # fut_list = ['CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB', 'TX', 'TE', 'TF']
-    fut_list = ['CA', 'CB', 'CC']
+    fut_list = ['CA', 'CB', 'CC', 'TX']
     for fut in fut_list:
         code = fut + 'F'
         in_path = '/home/user/Future_OHLC/'+f'{code}.csv'
