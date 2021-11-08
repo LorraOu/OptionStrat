@@ -84,14 +84,7 @@ def newton_vol_put(S, K, T, P, r, v):
 
 if __name__ == '__main__':
     # 分析選擇權代碼
-    option_list.option_code()
-    if os.path.isfile(in_path + '/options.csv'):
-        option_df = pd.read_csv(in_path + '/options.csv')
-        option_df = option_df.set_index('Code')
-    else:
-        print('error: file options.csv not found.')
-        print('program closing...')
-        exit(1)
+    # option_list.option_code()
 
     #更新期貨資料和歷史波動度
     future_day_price.future_day_price()
@@ -114,7 +107,7 @@ if __name__ == '__main__':
             if len(d) == 8:
                 existed.append(d)
     # opt_list = ['CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB', 'TX', 'TE', 'TF']
-    opt_list = ['TX', 'TE', 'TF']
+    opt_list = ['CA', 'CB', 'CC']
     for opt in opt_list:
         fut = opt + 'F'
         opt = opt + 'O'
@@ -126,6 +119,13 @@ if __name__ == '__main__':
                 for f in files:
                     if opt in f:
                         print('Processing option')
+                        if os.path.isfile(in_path + f'/{fut}.csv'):
+                            option_df = pd.read_csv(in_path + f'/{fut}.csv')
+                            option_df = option_df.set_index('Code')
+                        else:
+                            print('error: file options.csv not found.')
+                            print('program closing...')
+                            exit(1)
                         opt_code = f.split('.')[0]
                         # get k and delivery date
                         opt_crnt = option_df.loc[opt_code]
