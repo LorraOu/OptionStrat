@@ -148,16 +148,28 @@ if __name__ == '__main__':
                                 spamwriter = csv.writer(csvfile, delimiter=',')
                                 spamwriter.writerow([date,opt_code,fut_code])
                             continue
+                        fut_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
+                        fut_his_v = pd.read_csv(f'/home/user/Future_OHLC/{fut}.csv',dtype={"Date": str})
+                        fut_his_v = fut_his_v.set_index('Date')
+    
+                        # calculate theoretical settlement price from future data
+                        monthcal = c.monthdatescalendar(int(opt_crnt[2][0:4]),int(opt_crnt[2][4:6]))
+                        third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == int(opt_crnt[2][4:6])][2]
+                        if int(opt_crnt[2][6:8]) > third_wed.day:
+                            if int(opt_crnt[2][4:6]) == 12:
+                                fut_code ='{}{}{}'.format(fut,info_df.loc[1,'code'],str(int(opt_crnt[2][0:4])+1)[3]) #換月
+                            else:
+                                fut_code ='{}{}{}'.format(fut,info_df.loc[int(opt_crnt[2][4:6])+1,'code'],opt_crnt[2][3])
+                        else:
+                            fut_code ='{}{}{}'.format(fut,info_df.loc[int(opt_crnt[2][4:6]),'code'],opt_crnt[2][3])
                         if not os.path.isfile(f'/home/user/NasHistoryData/FutureCT/{opt_crnt[2]}/{fut_code}.csv'):
                             print('for option',opt_code + ',','future price data is missing.')
                             continue
                         else:
                             settle_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
                             settle_df = settle_df[settle_df['Tick'] != 0]
-                            final_s = settle_df.tail(1)['Last'].values(0)
-                        fut_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
-                        fut_his_v = pd.read_csv(f'/home/user/Future_OHLC/{fut}.csv',dtype={"Date": str})
-                        fut_his_v = fut_his_v.set_index('Date')
+                            final_s = int(settle_df.tail(1)['Last'].values[0])
+
                         #merge option and future price; record future price every 60 ticks
                         step = 60
                         fut_df_60 = pd.DataFrame(columns=fut_df.columns)
