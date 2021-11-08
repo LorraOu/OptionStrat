@@ -78,18 +78,21 @@ def future_day_price():
                     print(date,opn,high,low,close)
 def hist_vol():
     import math
-    code = 'TXF'
-    in_path = '/home/user/Future_OHLC/'+f'{code}.csv'
-    fut_df = pd.read_csv(in_path)
-    for i in range(len(fut_df)):
-        value = fut_df.iloc[i]
-        fut_df.loc[i,'r_hl_2'] = math.pow((math.log(value[2])/math.log(value[3])),2)
-    fut_df['sum_r'] = fut_df['r_hl_2'].rolling(15).sum()
-    for i in range(len(fut_df)):
-        value = fut_df.iloc[i]
-        fut_df.loc[i,'hist_vol'] = math.sqrt(value[6]/(60*math.log(2)))
-    fut_df = fut_df.drop(['r_hl_2','sum_r'],axis=1)
-    fut_df.to_csv(in_path,index=False)
+    # fut_list = ['CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB', 'TX', 'TE', 'TF']
+    fut_list = ['TX', 'TE', 'TF']
+    for fut in fut_list:
+        code = fut + 'F'
+        in_path = '/home/user/Future_OHLC/'+f'{code}.csv'
+        fut_df = pd.read_csv(in_path)
+        for i in range(len(fut_df)):
+            value = fut_df.iloc[i]
+            fut_df.loc[i,'r_hl_2'] = math.pow((math.log(value[2])/math.log(value[3])),2)
+        fut_df['sum_r'] = fut_df['r_hl_2'].rolling(15).sum()
+        for i in range(len(fut_df)):
+            value = fut_df.iloc[i]
+            fut_df.loc[i,'hist_vol'] = math.sqrt(value[6]/(60*math.log(2)))
+        fut_df = fut_df.drop(['r_hl_2','sum_r'],axis=1)
+        fut_df.to_csv(in_path,index=False)
 
 # option_df.to_csv(in_path+'/options.csv',index=False)
 # if __name__ == '__main__':
