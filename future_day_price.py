@@ -88,6 +88,7 @@ def hist_vol():
         fut_df = pd.read_csv(in_path)
         # sort all rows by date
         fut_df = fut_df.sort_values(by=['Date'])
+        fut_df = fut_df.drop_duplicates(subset=['Date'])
         for i in range(len(fut_df)):
             try:
                 value = fut_df.iloc[i]
