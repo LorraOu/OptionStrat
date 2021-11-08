@@ -153,15 +153,12 @@ if __name__ == '__main__':
                         fut_his_v = fut_his_v.set_index('Date')
     
                         # calculate theoretical settlement price from future data
-                        monthcal = c.monthdatescalendar(int(opt_crnt[2][0:4]),int(opt_crnt[2][4:6]))
-                        third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == int(opt_crnt[2][4:6])][2]
-                        if int(opt_crnt[2][6:8]) > third_wed.day:
-                            if int(opt_crnt[2][4:6]) == 12:
-                                fut_code ='{}{}{}'.format(fut,info_df.loc[1,'code'],str(int(opt_crnt[2][0:4])+1)[3]) #換月
-                            else:
-                                fut_code ='{}{}{}'.format(fut,info_df.loc[int(opt_crnt[2][4:6])+1,'code'],opt_crnt[2][3])
-                        else:
-                            fut_code ='{}{}{}'.format(fut,info_df.loc[int(opt_crnt[2][4:6]),'code'],opt_crnt[2][3])
+                        t_year = int(opt_crnt[2][0:4])
+                        t_month = int(opt_crnt[2][4:6])
+                        t_day = int(opt_crnt[2][6:8])
+                        monthcal = c.monthdatescalendar(t_year,t_month)
+                        third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == t_month][2]
+                        fut_code ='{}{}{}'.format(fut,info_df.loc[t_month,'code'],str(t_year)[3])
                         if not os.path.isfile(f'/home/user/NasHistoryData/FutureCT/{opt_crnt[2]}/{fut_code}.csv'):
                             print('for option',opt_code + ',','future price data is missing.')
                             continue
