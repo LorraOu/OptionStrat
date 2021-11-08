@@ -1,3 +1,5 @@
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 import datetime
 from typing import final
 import option_list
@@ -13,8 +15,6 @@ import numpy as np
 from scipy import stats as si
 import pathlib
 import csv
-import warnings
-warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
 #current file location
@@ -37,53 +37,52 @@ def BS_put(S0,K,T,r,v):   ##  BS Put Option value
     return p_value
 
 def newton_vol_call(S, K, T, C, r, v):
-    
     #S: spot price
     #K: strike price
     #T: time to maturity
     #C: Call value
     #r: interest rate
     #v: volatility of underlying asset
-    
-    d1 = (np.log(S / K) + (r - 0.5 * v ** 2) * T) / (v * np.sqrt(T))
-    d2 = (np.log(S / K) + (r - 0.5 * v ** 2) * T) / (v * np.sqrt(T))
-    
-    fx = S * si.norm.cdf(d1, 0.0, 1.0) - K * np.exp(-r * T) * si.norm.cdf(d2, 0.0, 1.0) - C
-    
-    vega = (1 / np.sqrt(2 * np.pi)) * S * np.sqrt(T) * np.exp(-(si.norm.cdf(d1, 0.0, 1.0) ** 2) * 0.5)
-    
-    tolerance = 0.000001
-    x0 = v
-    xnew  = x0
-    xold = x0 - 1
+    high = 5
+    low = 0
+    sigma = v
+    last_sig = v
+    while True:
+        print(sigma)
+        fx = BS_call(S, K, T, r, sigma) - C
+        if fx > 0:
+            last_sig  = sigma
+            high = sigma
+            sigma = (sigma + low) / 2
+        else:
+            last_sig  = sigma
+            low = sigma
+            sigma = (sigma + high) / 2
         
-    while abs(xnew - xold) > tolerance:
-    
-        xold = xnew
-        xnew = (xnew - fx - C) / vega
-        
-    return abs(xnew)
+        if abs(last_sig - sigma) < 0.00001:
+            break
+    return sigma
 
-def newton_vol_put(S, K, T, P, r, v):
-    
-    d1 = (np.log(S / K) + (r - 0.5 * v ** 2) * T) / (v * np.sqrt(T))
-    d2 = (np.log(S / K) + (r - 0.5 * v ** 2) * T) / (v * np.sqrt(T))
-    
-    fx = K * np.exp(-r * T) * si.norm.cdf(-d2, 0.0, 1.0) - S * si.norm.cdf(-d1, 0.0, 1.0) - P
-    
-    vega = (1 / np.sqrt(2 * np.pi)) * S * np.sqrt(T) * np.exp(-(si.norm.cdf(d1, 0.0, 1.0) ** 2) * 0.5)
-    
-    tolerance = 0.000001
-    x0 = v
-    xnew  = x0
-    xold = x0 - 1
+def newton_vol_put(S, K, T, P, r, v): 
+    high = 5
+    low = 0
+    sigma = v
+    last_sig = v
+    while True:
+        print(sigma)
+        fx = BS_put(S, K, T, r, sigma) - P
+        if fx > 0:
+            last_sig  = sigma
+            high = sigma
+            sigma = (sigma + low) / 2
+        else:
+            last_sig  = sigma
+            low = sigma
+            sigma = (sigma + high) / 2
         
-    while abs(xnew - xold) > tolerance:
-    
-        xold = xnew
-        xnew = (xnew - fx - P) / vega
-        
-    return abs(xnew)
+        if abs(last_sig - sigma) < 0.00001:
+            break
+    return sigma
 
 if __name__ == '__main__':
     # 分析選擇權代碼
@@ -146,8 +145,8 @@ if __name__ == '__main__':
                             print('Clearing price not found')
                             continue
                         # 先做call option
-                        if opt_crnt[0] == 'put':
-                            continue
+                        # if opt_crnt[0] == 'put':
+                        #     continue
                         # import corresponding future price information and historical volatility
                         c = calendar.Calendar(firstweekday=calendar.SUNDAY)
                         monthcal = c.monthdatescalendar(d.year,d.month)
