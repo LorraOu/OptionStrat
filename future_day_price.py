@@ -86,7 +86,7 @@ def hist_vol():
         in_path = '/home/user/Future_OHLC/'+f'{code}.csv'
         fut_df = pd.read_csv(in_path)
         # sort all rows by date
-        fut_df = fut_df.sort('Date')
+        fut_df = fut_df.sort_values(by=['Date'])
         for i in range(len(fut_df)):
             value = fut_df.iloc[i]
             fut_df.loc[i,'r_hl_2'] = math.pow((math.log(value[2])/math.log(value[3])),2)
