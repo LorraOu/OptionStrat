@@ -94,8 +94,8 @@ def hist_vol():
                 value = fut_df.iloc[i]
                 fut_df.loc[i,'r_hl_2'] = math.pow((math.log(value[2])/math.log(value[3])),2)
             except:
-                continue
-        fut_df = fut_df[not fut_df['r_hl_2'].isna]
+                fut_df.loc[i,'r_hl_2'] = 0
+        fut_df = fut_df[fut_df['r_hl_2']!=0]
         fut_df['sum_r'] = fut_df['r_hl_2'].rolling(15).sum()
         for i in range(len(fut_df)):
             value = fut_df.iloc[i]
