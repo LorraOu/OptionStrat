@@ -151,7 +151,7 @@ if __name__ == '__main__':
                                 spamwriter.writerow([date,opt_code,fut_code])
                             continue
                         fut_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
-                        fut_his_v = pd.read_csv(f'/home/user/Future_OHLC/{fut}.csv',dtype={"Date": str})
+                        fut_his_v = pd.read_csv(f'/home/user/Future_OHLC/{fut}_vol.csv',dtype={"Date": str})
                         fut_his_v = fut_his_v.set_index('Date')
     
                         # calculate theoretical settlement price from future data
