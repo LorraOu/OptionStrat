@@ -153,9 +153,9 @@ if __name__ == '__main__':
                         fut_his_v = fut_his_v.set_index('Date')
     
                         # calculate theoretical settlement price from future data
-                        t_year = int(opt_crnt[2][0:4])
-                        t_month = int(opt_crnt[2][4:6])
-                        t_day = int(opt_crnt[2][6:8])
+                        t_year = int(str(opt_crnt[2])[0:4])
+                        t_month = int(str(opt_crnt[2])[4:6])
+                        t_day = int(str(opt_crnt[2])[6:8])
                         monthcal = c.monthdatescalendar(t_year,t_month)
                         third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == t_month][2]
                         fut_code ='{}{}{}'.format(fut,info_df.loc[t_month,'code'],str(t_year)[3])
