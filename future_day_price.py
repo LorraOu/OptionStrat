@@ -57,6 +57,7 @@ def future_day_price():
                     high = 0
                     low = 0
                     close = 0
+                    last = 0
                     first_trade = 0
                     for i in range(0,len(df1),60):
                         value = df1.iloc[i]
@@ -88,8 +89,12 @@ def hist_vol():
         # sort all rows by date
         fut_df = fut_df.sort_values(by=['Date'])
         for i in range(len(fut_df)):
-            value = fut_df.iloc[i]
-            fut_df.loc[i,'r_hl_2'] = math.pow((math.log(value[2])/math.log(value[3])),2)
+            try:
+                value = fut_df.iloc[i]
+                fut_df.loc[i,'r_hl_2'] = math.pow((math.log(value[2])/math.log(value[3])),2)
+            except:
+                continue
+        fut_df = fut_df[not fut_df['r_hl_2'].isna]
         fut_df['sum_r'] = fut_df['r_hl_2'].rolling(15).sum()
         for i in range(len(fut_df)):
             value = fut_df.iloc[i]
