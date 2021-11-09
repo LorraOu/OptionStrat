@@ -89,6 +89,7 @@ def hist_vol():
         # sort all rows by date
         fut_df = fut_df.sort_values(by=['Date'])
         fut_df = fut_df.drop_duplicates(subset=['Date'])
+        fut_df = fut_df[fut_df['Low']!=0]
         fut_df = fut_df.reset_index(drop=True)
         for i in range(len(fut_df)):
             try:
@@ -96,8 +97,6 @@ def hist_vol():
                 fut_df.loc[i,'r_hl_2'] = math.pow(math.log(value[2]/value[3]),2)
             except:
                 fut_df.loc[i,'r_hl_2'] = 0
-        fut_df = fut_df[fut_df['r_hl_2']!=0]
-        fut_df = fut_df.reset_index(drop=True)
         fut_df['sum_r'] = fut_df['r_hl_2'].rolling(15).sum()
         for i in range(len(fut_df)):
             value = fut_df.loc[i]
