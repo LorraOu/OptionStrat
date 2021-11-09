@@ -130,6 +130,7 @@ if __name__ == '__main__':
                         # get k and delivery date
                         opt_crnt = option_df.loc[opt_code]
                         opt_df = pd.read_csv(opt_path + f'/{date}/{opt_code}.csv')
+                        opt_df = opt_df[opt_df['Tick']!=0]
                         if len(opt_df) == 0:
                             print('Option no transaction on',date)
                             continue
@@ -186,7 +187,10 @@ if __name__ == '__main__':
                             'ASKSZ2', 'ASK3', 'ASKSZ3', 'ASK4', 'ASKSZ4', 'ASK5', 'ASKSZ5',
                             'Volume', 'LastTime'],axis=1)
                         fut_df_60 = fut_df_60.rename(columns={'Last':'Future_last'})
-                        merge_df = opt_df.merge(fut_df_60,how='outer',on='Time').fillna(method='ffill')
+                        fut_df_60 = fut_df_60.sort_values(by=['Time'])
+                        opt_df = opt_df.sort_values(by=['Time'])
+                        merge_df = pd.merge(opt_df,fut_df_60,how='left',on='Time').fillna(method='ffill')
+                        merge_df = merge_df.dropna(axis = 0)
                         merge_df = merge_df.dropna(axis = 0)
                         merge_df['K'] = opt_crnt[1]
                         t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
