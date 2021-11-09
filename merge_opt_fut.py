@@ -167,7 +167,7 @@ if __name__ == '__main__':
                             continue
                         else:
                             settle_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
-                            final_s = int(settle_df.tail(1)['Last'].values[0])
+                            final_s = int(settle_df.tail(1)['Last'])
 
                         #merge option and future price; record future price every 60 ticks
                         step = 60
