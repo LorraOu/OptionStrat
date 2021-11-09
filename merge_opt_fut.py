@@ -130,6 +130,9 @@ if __name__ == '__main__':
                         # get k and delivery date
                         opt_crnt = option_df.loc[opt_code]
                         opt_df = pd.read_csv(opt_path + f'/{date}/{opt_code}.csv')
+                        if len(opt_df) == 0:
+                            print('Option no transaction on',date)
+                            continue
                         # 先做call option
                         # if opt_crnt[0] == 'put':
                         #     continue
@@ -184,12 +187,10 @@ if __name__ == '__main__':
                             'Volume', 'LastTime'],axis=1)
                         fut_df_60 = fut_df_60.rename(columns={'Last':'Future_last'})
                         merge_df = opt_df.merge(fut_df_60,how='outer',on='Time').fillna(method='ffill')
-                        merge_df = merge_df[merge_df['Last'] !=0]
-                        merge_df = merge_df[merge_df['Future_last'] != 0]
-                        merge_df = merge_df[merge_df['Tick'] != 0]
+                        merge_df = merge_df.dropna(axis = 0)
                         merge_df['K'] = opt_crnt[1]
                         t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
-                        merge_df['T'] = t_delta.days/360
+                        merge_df['T'] = t_delta.days/252
                         merge_df['V'] = fut_his_v.loc[date,'hist_vol']
                         merge_df['S'] = (merge_df['BID1'] + merge_df['ASK1'])/2
                         merge_df = merge_df.reset_index(drop=True)
