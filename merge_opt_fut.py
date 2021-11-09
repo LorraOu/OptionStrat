@@ -177,7 +177,7 @@ if __name__ == '__main__':
                             continue
                         else:
                             settle_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
-                            final_s = int(settle_df.tail(1)['Last'])
+                            final_s = int(settle_df.iloc[len(settle_df)-1][1])
 
                         #merge option and future price; record future price every 60 ticks
                         step = 60
@@ -196,7 +196,6 @@ if __name__ == '__main__':
                         fut_df_60 = fut_df_60.sort_values(by=['Time'])
                         opt_df = opt_df.sort_values(by=['Time'])
                         merge_df = pd.merge(opt_df,fut_df_60,how='left',on='Time').fillna(method='ffill')
-                        merge_df = merge_df.dropna(axis = 0)
                         merge_df = merge_df.dropna(axis = 0)
                         merge_df['K'] = opt_crnt[1]
                         t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
@@ -224,6 +223,7 @@ if __name__ == '__main__':
                                 merge_df.loc[i,'Clearing_price'] = max(opt_crnt[1] - final_s,0)
                                 merge_df.loc[i,'Implied_Volatility'] = newton_vol_put(value[9],value[6],value[7],merge_df.loc[i,'Last'],0.03,value[8])
                         if len(merge_df) == 0:
+                            print('Discard',opt_code,'because no effective transaction is recorded (very likely due to missing values)')
                             continue
                         merge_df['Last-Clearing'] = merge_df['Last'] - merge_df['Clearing_price']
                         merge_df['Option_Price-Clearing'] = merge_df['Option_Price'] - merge_df['Clearing_price']
