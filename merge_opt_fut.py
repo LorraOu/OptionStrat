@@ -87,7 +87,7 @@ if __name__ == '__main__':
     # option_list.option_code()
 
     #更新期貨資料和歷史波動度
-    # future_day_price.future_day_price()
+    future_day_price.future_day_price()
     future_day_price.hist_vol()
 
     print('merging future and option price data...')
@@ -106,11 +106,17 @@ if __name__ == '__main__':
         for d in dirs:
             if len(d) == 8:
                 existed.append(d)
-    # opt_list = ['CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB', 'TX', 'TE', 'TF']
-    opt_list = ['TX']
+    opt_list = ['CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB', 'TX', 'TE', 'TF']
     for opt in opt_list:
-        fut = opt + 'F'
-        opt = opt + 'O'
+        if opt == 'TE':
+            fut = 'EXF'
+            opt = opt + 'O'
+        elif opt == 'TF':
+            fut = 'FXF'
+            opt = opt + 'O'
+        else:
+            fut = opt + 'F'
+            opt = opt + 'O'
         for d in dir_list:
             date = dt.strftime(d,'%Y%m%d')
             if date in existed:

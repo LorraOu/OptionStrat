@@ -21,10 +21,14 @@ def future_day_price():
         for d in dirs:
             if len(d) == 8:
                 dir_list.append(dt.strptime(d,'%Y%m%d'))
-    # fut_list = ['CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB', 'TX', 'TE', 'TF']
-    fut_list = ['CA', 'CB', 'CC', 'TX']
+    fut_list = ['CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB', 'TX', 'TE', 'TF']
     for fut in fut_list:
-        fut = fut + 'F'
+        if fut == 'TE':
+            fut = 'EXF'
+        elif fut == 'TF':
+            fut = 'FXF'
+        else:
+            fut = fut + 'F'
         print(fut)
         #從之前的檔案列出最後更新日期
         if  not os.path.isfile(out_path + f'/{fut}.csv'):
@@ -80,10 +84,14 @@ def future_day_price():
                     print(date,opn,high,low,close)
 def hist_vol():
     import math
-    # fut_list = ['CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB', 'TX', 'TE', 'TF']
-    fut_list = ['CA', 'CB', 'CC', 'TX']
+    fut_list = ['CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB', 'TX', 'TE', 'TF']
     for fut in fut_list:
-        code = fut + 'F'
+        if fut == 'TE':
+            code = 'EXF'
+        elif fut == 'TF':
+            code = 'FXF'
+        else:
+            code = fut + 'F'
         in_path = '/home/user/Future_OHLC/'+f'{code}.csv'
         fut_df = pd.read_csv(in_path)
         # sort all rows by date
@@ -103,8 +111,3 @@ def hist_vol():
             fut_df.loc[i,'hist_vol'] = math.sqrt(value[6]/(60*math.log(2)))*math.sqrt(252)
         fut_df = fut_df.drop(['r_hl_2','sum_r'],axis=1)
         fut_df.to_csv('/home/user/Future_OHLC/'+f'{code}_vol.csv',index=False)
-
-# option_df.to_csv(in_path+'/options.csv',index=False)
-# if __name__ == '__main__':
-#     future_day_price()
-#     hist_vol()
