@@ -118,7 +118,7 @@ if __name__ == '__main__':
             for root,dirs,files in walk(f'/home/user/NasHistoryData/OptionCT/{date}'):
                 for f in files:
                     if opt in f:
-                        print('Processing option')
+                        print('Processing option',f,date)
                         if os.path.isfile(in_path + f'/option_codes/{opt}.csv'):
                             option_df = pd.read_csv(in_path + f'/option_codes/{opt}.csv')
                             option_df = option_df.set_index('Code')
