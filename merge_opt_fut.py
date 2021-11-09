@@ -87,8 +87,8 @@ if __name__ == '__main__':
     # option_list.option_code()
 
     #更新期貨資料和歷史波動度
-    future_day_price.future_day_price()
-    future_day_price.hist_vol()
+    # future_day_price.future_day_price()
+    # future_day_price.hist_vol()
 
     print('merging future and option price data...')
     #merge選擇權資料和現貨價格
@@ -201,7 +201,12 @@ if __name__ == '__main__':
                         merge_df['K'] = opt_crnt[1]
                         t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
                         merge_df['T'] = t_delta.days/252
-                        merge_df['V'] = fut_his_v.loc[date,'hist_vol']
+                        # locate historical volatility
+                        try:
+                            merge_df['V'] = fut_his_v.loc[date,'hist_vol']
+                        except:
+                            pre_d = dt.strftime(d - timedelta(days=1),'%Y%m%d')
+                            merge_df['V'] = fut_his_v.loc[pre_d,'hist_vol']
                         merge_df['S'] = (merge_df['BID1'] + merge_df['ASK1'])/2
                         merge_df = merge_df.reset_index(drop=True)
                         for i in range(len(merge_df)):
