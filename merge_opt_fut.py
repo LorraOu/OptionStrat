@@ -87,7 +87,7 @@ if __name__ == '__main__':
     # option_list.option_code()
 
     #更新期貨資料和歷史波動度
-    future_day_price.future_day_price()
+    # future_day_price.future_day_price()
     future_day_price.hist_vol()
 
     print('merging future and option price data...')
