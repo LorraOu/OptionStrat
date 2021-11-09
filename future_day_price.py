@@ -93,7 +93,7 @@ def hist_vol():
         for i in range(len(fut_df)):
             try:
                 value = fut_df.loc[i]
-                fut_df.loc[i,'r_hl_2'] = math.pow((math.log(value[2])/math.log(value[3])),2)
+                fut_df.loc[i,'r_hl_2'] = math.pow(math.log(value[2]/value[3]),2)
             except:
                 fut_df.loc[i,'r_hl_2'] = 0
         fut_df = fut_df[fut_df['r_hl_2']!=0]
