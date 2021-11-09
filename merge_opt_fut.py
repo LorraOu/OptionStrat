@@ -202,11 +202,15 @@ if __name__ == '__main__':
                         t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
                         merge_df['T'] = t_delta.days/252
                         # locate historical volatility
-                        try:
-                            merge_df['V'] = fut_his_v.loc[date,'hist_vol']
-                        except:
-                            pre_d = dt.strftime(d - timedelta(days=1),'%Y%m%d')
-                            merge_df['V'] = fut_his_v.loc[pre_d,'hist_vol']
+                        t_d = d
+                        t_date = date
+                        while True:
+                            try:
+                                merge_df['V'] = fut_his_v.loc[t_date,'hist_vol']
+                                break
+                            except:
+                                t_d = t_d - timedelta(days=1)
+                                t_date = dt.strftime(t_d,'%Y%m%d')
                         merge_df['S'] = (merge_df['BID1'] + merge_df['ASK1'])/2
                         merge_df = merge_df.reset_index(drop=True)
                         for i in range(len(merge_df)):
