@@ -202,12 +202,12 @@ if __name__ == '__main__':
                             value = merge_df.iloc[i]
                             if opt_crnt[0] == 'call':
                                 merge_df.loc[i,'Option_Price'] = BS_call(value[4],value[6],value[7],0.03,value[8])
-                                merge_df.loc[i,'Clearing_price'] = final_s - opt_crnt[1]
-                                merge_df.loc[i,'Implied_Volatility'] = newton_vol_call(value[9],value[6],value[7],merge_df.loc[i,'Option_Price'],0.03,value[8])
+                                merge_df.loc[i,'Clearing_price'] = max(final_s - opt_crnt[1],0)
+                                merge_df.loc[i,'Implied_Volatility'] = newton_vol_call(value[9],value[6],value[7],merge_df.loc[i,'Last'],0.03,value[8])
                             else:
                                 merge_df.loc[i,'Option_Price'] = BS_put(value[4],value[6],value[7],0.03,value[8])
-                                merge_df.loc[i,'Clearing_price'] = opt_crnt[1] - final_s
-                                merge_df.loc[i,'Implied_Volatility'] = newton_vol_put(value[9],value[6],value[7],merge_df.loc[i,'Option_Price'],0.03,value[8])
+                                merge_df.loc[i,'Clearing_price'] = max(opt_crnt[1] - final_s,0)
+                                merge_df.loc[i,'Implied_Volatility'] = newton_vol_put(value[9],value[6],value[7],merge_df.loc[i,'Last'],0.03,value[8])
                         if len(merge_df) == 0:
                             continue
                         merge_df['Last-Clearing'] = merge_df['Last'] - merge_df['Clearing_price']
