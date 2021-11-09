@@ -118,7 +118,6 @@ if __name__ == '__main__':
             for root,dirs,files in walk(f'/home/user/NasHistoryData/OptionCT/{date}'):
                 for f in files:
                     if opt in f:
-                        print('Processing option',f,date)
                         if os.path.isfile(in_path + f'/option_codes/{opt}.csv'):
                             option_df = pd.read_csv(in_path + f'/option_codes/{opt}.csv')
                             option_df = option_df.set_index('Code')
@@ -144,6 +143,7 @@ if __name__ == '__main__':
                                 fut_code ='{}{}{}'.format(fut,info_df.loc[d.month+1,'code'],str(d.year)[3])
                         else:
                             fut_code ='{}{}{}'.format(fut,info_df.loc[d.month,'code'],str(d.year)[3])
+                        print('Processing option',f,date,fut_code)
                         if not os.path.isfile(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv'):
                             print('for option',opt_code + ',','future price data is missing.')
                             with open(in_path + '/future_missing.csv', "w") as csvfile:
