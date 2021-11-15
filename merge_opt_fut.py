@@ -196,7 +196,7 @@ if __name__ == '__main__':
                         fut_df_60 = fut_df_60.rename(columns={'Last':'Future_last'})
                         fut_df_60 = fut_df_60.sort_values(by=['Time'])
                         opt_df = opt_df.sort_values(by=['Time'])
-                        merge_df = pd.merge(opt_df,fut_df_60,how='left',on='Time').fillna(method='ffill')
+                        merge_df = pd.merge(opt_df,fut_df_60,how='left',on='Time',sort=True).fillna(method='ffill')
                         merge_df = merge_df.dropna(axis = 0)
                         merge_df['K'] = opt_crnt[1]
                         t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
