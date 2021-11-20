@@ -33,13 +33,13 @@ def future_day_price():
             fut = fut + 'F'
         print(fut)
         #從之前的檔案列出最後更新日期
-        if  not os.path.isfile(out_path + f'/{fut}.csv'):
+        if  not os.path.isfile(out_path + f'/{fut}_vol.csv'):
             with open(out_path + f'/{fut}.csv', "w") as csvfile:
                 spamwriter = csv.writer(csvfile, delimiter=',')
                 spamwriter.writerow(['Date','Open','High','Low','Close'])
             last_date = datetime.datetime(1999,1,1)
         else:
-            in_path = '/home/user/Future_OHLC/'+f'{fut}.csv'
+            in_path = '/home/user/Future_OHLC/'+f'{fut}_vol.csv'
             fut_df = pd.read_csv(in_path)
             l_d = str(fut_df.loc[len(fut_df)-1,'Date'])
             last_date = dt.strptime(l_d,'%Y%m%d')
