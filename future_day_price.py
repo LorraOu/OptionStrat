@@ -55,10 +55,10 @@ def future_day_price():
                     code ='{}{}{}'.format(fut,info_df.loc[d.month,'code'],str(d.year)[3]) #使用結算日當天契約價格當作現貨價格
                 date = dt.strftime(d,'%Y%m%d')
                 path = f'/home/user/NasHistoryData/FutureCT/{date}/{code}.csv'
-                mask = (df1['Time'] >= 84500000000)
-                df1 = df1[mask]
                 if os.path.isfile(path):
                     df1 = pd.read_csv(path)
+                    mask = (df1['Time'] >= 84500000000)
+                    df1 = df1[mask]
                     opn = 0
                     high = 0
                     low = 0
