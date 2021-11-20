@@ -63,7 +63,7 @@ def future_day_price():
                     close = 0
                     last = 0
                     first_trade = 0
-                    for i in range(0,len(df1),60):
+                    for i in range(len(df1)):
                         value = df1.iloc[i]
                         if opn == 0:
                             if value[1] != 0 and first_trade == 0:
