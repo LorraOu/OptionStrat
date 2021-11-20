@@ -15,6 +15,8 @@ import numpy as np
 from scipy import stats as si
 import pathlib
 import csv
+from workalendar.asia import Taiwan
+cal = Taiwan()
 
 
 #current file location
@@ -120,7 +122,7 @@ if __name__ == '__main__':
             opt = opt + 'O'
         for d in dir_list:
             date = dt.strftime(d,'%Y%m%d')
-            if date in existed:
+            if date in existed or (not cal.is_working_day(d)):
                 continue
             for root,dirs,files in walk(f'/home/user/NasHistoryData/OptionCT/{date}'):
                 for f in files:

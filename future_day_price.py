@@ -7,6 +7,8 @@ import datetime
 import pathlib
 import csv
 import os
+from workalendar.asia import Taiwan
+cal = Taiwan()
 in_path = str(pathlib.Path(__file__).parent.absolute())
 
 def future_day_price():
@@ -42,7 +44,7 @@ def future_day_price():
             l_d = str(fut_df.loc[len(fut_df)-1,'Date'])
             last_date = dt.strptime(l_d,'%Y%m%d')
         for d in dir_list:
-            if d > last_date:
+            if d > last_date and cal.is_working_day(d):
                 c = calendar.Calendar(firstweekday=calendar.SUNDAY)
                 monthcal = c.monthdatescalendar(d.year,d.month)
                 third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == d.month][2]
