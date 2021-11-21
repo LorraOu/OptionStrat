@@ -200,6 +200,9 @@ if __name__ == '__main__':
                         opt_df = opt_df.sort_values(by=['Time'])
                         merge_df = pd.merge(opt_df,fut_df_60,how='left',on='Time',sort=True).fillna(method='ffill')
                         merge_df = merge_df.dropna(axis = 0)
+                        # 調整履約價格
+                        if fut_df_60.tail(1)['Last'].values[0]/opt_crnt[1] > 3:
+                            opt_crnt[1] = opt_crnt[1]/10
                         merge_df['K'] = opt_crnt[1]
                         t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
                         merge_df['T'] = t_delta.days/252
