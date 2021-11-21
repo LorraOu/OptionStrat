@@ -166,21 +166,21 @@ if __name__ == '__main__':
                         fut_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
                         fut_his_v = pd.read_csv(f'/home/user/Future_OHLC/{fut}_vol.csv',dtype={"Date": str})
                         fut_his_v = fut_his_v.set_index('Date')
-    
+        
                         # calculate theoretical settlement price from future data
-                        t_year = int(str(opt_crnt[2])[0:4])
-                        t_month = int(str(opt_crnt[2])[4:6])
-                        t_day = int(str(opt_crnt[2])[6:8])
-                        monthcal = c.monthdatescalendar(t_year,t_month)
-                        third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == t_month][2]
-                        fut_code ='{}{}{}'.format(fut,info_df.loc[t_month,'code'],str(t_year)[3])
-                        print('loading future settlement price from date', opt_crnt[2], fut_code)
-                        if not os.path.isfile(f'/home/user/NasHistoryData/FutureCT/{opt_crnt[2]}/{fut_code}.csv'):
-                            print('for option',opt_code + ',','settlement future price data is missing.')
-                            continue
-                        else:
-                            settle_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
-                            final_s = int(settle_df.loc[len(settle_df)-1,'Last'])
+                        # t_year = int(str(opt_crnt[2])[0:4])
+                        # t_month = int(str(opt_crnt[2])[4:6])
+                        # t_day = int(str(opt_crnt[2])[6:8])
+                        # monthcal = c.monthdatescalendar(t_year,t_month)
+                        # third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == t_month][2]
+                        # fut_code ='{}{}{}'.format(fut,info_df.loc[t_month,'code'],str(t_year)[3])
+                        # print('loading future settlement price from date', opt_crnt[2], fut_code)
+                        # if not os.path.isfile(f'/home/user/NasHistoryData/FutureCT/{opt_crnt[2]}/{fut_code}.csv'):
+                        #     print('for option',opt_code + ',','settlement future price data is missing.')
+                        #     continue
+                        # else:
+                        #     settle_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
+                        #     final_s = int(settle_df.loc[len(settle_df)-1,'Last'])
 
                         #merge option and future price; record future price every 60 ticks
                         step = 60
@@ -206,6 +206,8 @@ if __name__ == '__main__':
                         merge_df['K'] = opt_crnt[1]
                         t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
                         merge_df['T'] = t_delta.days/252
+                        # 紀錄期貨在結算當天收盤價
+                        final_s = fut_his_v.loc[opt_crnt[2],'Close']
                         # locate historical volatility
                         t_d = d
                         t_date = date
@@ -217,6 +219,7 @@ if __name__ == '__main__':
                                 t_d = t_d - timedelta(days=1)
                                 t_date = dt.strftime(t_d,'%Y%m%d')
                         merge_df['S'] = (merge_df['BID1'] + merge_df['ASK1'])/2
+                        merge_df['S*'] = final_s
                         merge_df = merge_df.reset_index(drop=True)
                         for i in range(len(merge_df)):
                             value = merge_df.iloc[i]
