@@ -127,7 +127,6 @@ if __name__ == '__main__':
             for root,dirs,files in walk(f'/home/user/NasHistoryData/OptionCT/{date}'):
                 for f in files:
                     if opt in f:
-                        print('Processing option',f,date)
                         if os.path.isfile(in_path + f'/option_codes/{opt}.csv'):
                             option_df = pd.read_csv(in_path + f'/option_codes/{opt}.csv')
                             option_df = option_df.set_index('Code')
@@ -138,6 +137,7 @@ if __name__ == '__main__':
                         opt_code = f.split('.')[0]
                         # get k and delivery date
                         opt_crnt = option_df.loc[opt_code]
+                        print('Processing option',f,date,'expire on',opt_crnt[2])
                         opt_df = pd.read_csv(opt_path + f'/{date}/{opt_code}.csv')
                         opt_df = opt_df[opt_df['Tick']!=0]
                         if len(opt_df) == 0:
@@ -232,13 +232,13 @@ if __name__ == '__main__':
                         for i in range(len(merge_df)):
                             value = merge_df.iloc[i]
                             if opt_crnt[0] == 'call':
-                                merge_df.loc[i,'Option_Price'] = BS_call(value[4],value[6],value[7],0.03,value[8])
+                                merge_df.loc[i,'Option_Price'] = BS_call(value[3],value[6],value[7],0.03,value[8])
                                 merge_df.loc[i,'Clearing_price'] = max(final_s - opt_crnt[1],0)
-                                merge_df.loc[i,'Implied_Volatility'] = newton_vol_call(value[9],value[6],value[7],merge_df.loc[i,'Last'],0.03,value[8])
+                                merge_df.loc[i,'Implied_Volatility'] = newton_vol_call(value[9],value[6],value[7],value[1],0.03,value[8])
                             else:
-                                merge_df.loc[i,'Option_Price'] = BS_put(value[4],value[6],value[7],0.03,value[8])
+                                merge_df.loc[i,'Option_Price'] = BS_put(value[3],value[6],value[7],0.03,value[8])
                                 merge_df.loc[i,'Clearing_price'] = max(opt_crnt[1] - final_s,0)
-                                merge_df.loc[i,'Implied_Volatility'] = newton_vol_put(value[9],value[6],value[7],merge_df.loc[i,'Last'],0.03,value[8])
+                                merge_df.loc[i,'Implied_Volatility'] = newton_vol_put(value[9],value[6],value[7],value[1],0.03,value[8])
                         if len(merge_df) == 0:
                             print('Discard',opt_code,'because no effective transaction is recorded (very likely due to missing values)')
                             continue
