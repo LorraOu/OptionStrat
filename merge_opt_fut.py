@@ -166,7 +166,11 @@ if __name__ == '__main__':
                         fut_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
                         fut_his_v = pd.read_csv(f'/home/user/Future_OHLC/{fut}_vol.csv',dtype={"Date": str})
                         fut_his_v = fut_his_v.set_index('Date')
-        
+                        # 去除試搓價格
+                        mask = (fut_df['Time'] >= 84500000000)
+                        fut_df = fut_df[mask]
+                        mask = (opt_df['Time'] >= 84500000000)
+                        opt_df = opt_df[mask]
                         # calculate theoretical settlement price from future data
                         # t_year = int(str(opt_crnt[2])[0:4])
                         # t_month = int(str(opt_crnt[2])[4:6])
@@ -183,13 +187,10 @@ if __name__ == '__main__':
                         #     final_s = int(settle_df.loc[len(settle_df)-1,'Last'])
 
                         #merge option and future price; record future price every 1 minute
-                        begin = 84500000000
-                        step = 100000000
                         fut_df_60 = pd.DataFrame(columns=fut_df.columns)
                         for i in range(len(fut_df)):
-                            if fut_df.iloc[i]['Time'] >= begin:
-                                fut_df_60.append(fut_df.iloc[i],ignore_index=True)
-                            begin = begin + step
+                            if i%60 == 0:
+                                fut_df_60 = fut_df_60.append(fut_df.iloc[i],ignore_index=True)
                         fut_df_60 = fut_df_60.drop(['Vol','BIDSZ1', 'BID2', 'BIDSZ2', 'BID3',
                             'BIDSZ3', 'BID4', 'BIDSZ4', 'BID5', 'BIDSZ5', 'ASKSZ1', 'ASK2',
                             'ASKSZ2', 'ASK3', 'ASKSZ3', 'ASK4', 'ASKSZ4', 'ASK5', 'ASKSZ5', 'Tick',
