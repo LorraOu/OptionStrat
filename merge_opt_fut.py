@@ -182,8 +182,15 @@ if __name__ == '__main__':
                         #     settle_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
                         #     final_s = int(settle_df.loc[len(settle_df)-1,'Last'])
 
-                        #merge option and future price; record future price every 60 ticks
-                        fut_df = fut_df.drop(['Vol','BIDSZ1', 'BID2', 'BIDSZ2', 'BID3',
+                        #merge option and future price; record future price every 1 minute
+                        begin = 84500000000
+                        step = 100000000
+                        fut_df_60 = pd.DataFrame(columns=fut_df.columns)
+                        for i in range(len(fut_df)):
+                            if fut_df.iloc[i]['Time'] >= begin:
+                                fut_df_60.append(fut_df.iloc[i],ignore_index=True)
+                            begin = begin + step
+                        fut_df_60 = fut_df_60.drop(['Vol','BIDSZ1', 'BID2', 'BIDSZ2', 'BID3',
                             'BIDSZ3', 'BID4', 'BIDSZ4', 'BID5', 'BIDSZ5', 'ASKSZ1', 'ASK2',
                             'ASKSZ2', 'ASK3', 'ASKSZ3', 'ASK4', 'ASKSZ4', 'ASK5', 'ASKSZ5', 'Tick',
                             'Volume', 'LastTime'],axis=1)
@@ -191,13 +198,13 @@ if __name__ == '__main__':
                             'BIDSZ3', 'BID4', 'BIDSZ4', 'BID5', 'BIDSZ5', 'ASK1', 'ASKSZ1', 'ASK2',
                             'ASKSZ2', 'ASK3', 'ASKSZ3', 'ASK4', 'ASKSZ4', 'ASK5', 'ASKSZ5',
                             'Volume', 'LastTime'],axis=1)
-                        fut_df = fut_df.rename(columns={'Last':'Future_last'})
-                        fut_df = fut_df.sort_values(by=['Time'])
+                        fut_df_60 = fut_df_60.rename(columns={'Last':'Future_last'})
+                        fut_df_60 = fut_df_60.sort_values(by=['Time'])
                         opt_df = opt_df.sort_values(by=['Time'])
-                        merge_df = pd.merge(opt_df,fut_df,how='left',on='Time',sort=True).fillna(method='ffill')
+                        merge_df = pd.merge(opt_df,fut_df_60,how='left',on='Time',sort=True).fillna(method='ffill')
                         merge_df = merge_df.dropna(axis = 0)
                         # 調整履約價格
-                        if fut_df.tail(1)['Future_last'].values[0]/opt_crnt[1] > 3:
+                        if fut_df_60.tail(1)['Future_last'].values[0]/opt_crnt[1] > 3:
                             opt_crnt[1] = opt_crnt[1]/10
                         merge_df['K'] = opt_crnt[1]
                         t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
