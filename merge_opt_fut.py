@@ -150,6 +150,7 @@ if __name__ == '__main__':
                         y = str(opt_crnt[2])[3]
                         m = int(str(opt_crnt[2])[4:6])
                         fut_code ='{}{}{}'.format(fut,info_df.loc[m,'code'],y)
+                        print('Get future price from contract',fut_code)
                         if not os.path.isfile(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv'):
                             print('for option',opt_code + ',','future price data is missing.')
                             with open(in_path + '/future_missing.csv', "w") as csvfile:
@@ -180,11 +181,11 @@ if __name__ == '__main__':
                         #     final_s = int(settle_df.loc[len(settle_df)-1,'Last'])
 
                         #merge option and future price; record future price every 1 minute
-                        fut_df_60 = pd.DataFrame(columns=fut_df.columns)
-                        step = 60
-                        for i in range(0,len(fut_df),step):
-                            fut_df_60 = fut_df_60.append(fut_df.iloc[i],ignore_index=True)
-                        fut_df_60 = fut_df_60.drop(['Vol','BIDSZ1', 'BID2', 'BIDSZ2', 'BID3',
+                        # fut_df_60 = pd.DataFrame(columns=fut_df.columns)
+                        # step = 60
+                        # for i in range(0,len(fut_df),step):
+                        #     fut_df_60 = fut_df_60.append(fut_df.iloc[i],ignore_index=True)
+                        fut_df = fut_df.drop(['Vol','BIDSZ1', 'BID2', 'BIDSZ2', 'BID3',
                             'BIDSZ3', 'BID4', 'BIDSZ4', 'BID5', 'BIDSZ5', 'ASKSZ1', 'ASK2',
                             'ASKSZ2', 'ASK3', 'ASKSZ3', 'ASK4', 'ASKSZ4', 'ASK5', 'ASKSZ5', 'Tick',
                             'Volume', 'LastTime'],axis=1)
@@ -192,21 +193,20 @@ if __name__ == '__main__':
                             'BIDSZ3', 'BID4', 'BIDSZ4', 'BID5', 'BIDSZ5', 'ASK1', 'ASKSZ1', 'ASK2',
                             'ASKSZ2', 'ASK3', 'ASKSZ3', 'ASK4', 'ASKSZ4', 'ASK5', 'ASKSZ5',
                             'Volume', 'LastTime'],axis=1)
-                        fut_df_60 = fut_df_60.rename(columns={'Last':'Future_last'})
-                        fut_df_60 = fut_df_60.sort_values(by=['Time'])
-                        fut_df_60 = fut_df_60.set_index('Time')
-                        opt_df = opt_df.sort_values(by=['Time'])
+                        fut_df = fut_df.rename(columns={'Last':'Future_last'})
+                        fut_df = fut_df.set_index('Time')
                         opt_df = opt_df.set_index('Time')
-                        merge_df = pd.merge(opt_df,fut_df_60,how='outer',left_index=True, right_index=True).fillna(method='ffill')
-                        merge_df = merge_df.dropna(axis = 0)
+                        merge_df = pd.merge(opt_df,fut_df,how='outer',left_index=True, right_index=True).fillna(method='ffill')
+                        # merge_df = merge_df.dropna(axis = 0)
                         merge_df = merge_df.reset_index(drop=False)
+                        merge_df['Time'] = merge_df['Time'].astype(int)
                         # remove duplicate value after merging
-                        # opt_time_l = list(opt_df.index)
-                        # for i in merge_df.index:
-                        #     if merge_df.loc[i,'Time'] not in opt_time_l:
-                        #         merge_df = merge_df.drop(i,axis=0)
+                        opt_time_l = list(opt_df.index)
+                        for i in merge_df.index:
+                            if merge_df.loc[i,'Time'] not in opt_time_l:
+                                merge_df = merge_df.drop(i,axis=0)
                         # 調整履約價格
-                        if fut_df_60.tail(1)['Future_last'].values[0]/opt_crnt[1] > 3:
+                        if fut_df.tail(1)['Future_last'].values[0]/opt_crnt[1] > 3:
                             opt_crnt[1] = opt_crnt[1]/10
                         merge_df['K'] = opt_crnt[1]
                         t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
