@@ -201,10 +201,10 @@ if __name__ == '__main__':
                         merge_df = merge_df.dropna(axis = 0)
                         merge_df = merge_df.reset_index(drop=False)
                         # remove duplicate value after merging
-                        opt_time_l = list(opt_df.index)
-                        for i in merge_df.index:
-                            if merge_df.loc[i,'Time'] not in opt_time_l:
-                                merge_df = merge_df.drop(i,axis=0)
+                        # opt_time_l = list(opt_df.index)
+                        # for i in merge_df.index:
+                        #     if merge_df.loc[i,'Time'] not in opt_time_l:
+                        #         merge_df = merge_df.drop(i,axis=0)
                         # 調整履約價格
                         if fut_df_60.tail(1)['Future_last'].values[0]/opt_crnt[1] > 3:
                             opt_crnt[1] = opt_crnt[1]/10
