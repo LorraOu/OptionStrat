@@ -264,6 +264,6 @@ if __name__ == '__main__':
                         except OSError:
                             print('Creation of the directory {} failed'.format(output_folder))
                             exit(1)
-                        output_path = output_folder + f'/{opt_code}.csv'
+                        output_path = output_folder + f'/{opt_code}_{date[0:4]}-{date[4:6]}-{date[6:8]}.csv'
                         merge_df.to_csv(output_path,index=False)
                         print('Output:',output_path)
