@@ -160,10 +160,10 @@ if __name__ == '__main__':
                         fut_his_v = pd.read_csv(f'/home/user/Future_OHLC/{fut}_vol.csv',dtype={"Date": str})
                         fut_his_v = fut_his_v.set_index('Date')
                         # 去除試搓價格
-                        mask = (fut_df['Time'] >= 84500000000)
-                        fut_df = fut_df[mask]
-                        mask = (opt_df['Time'] >= 84500000000)
-                        opt_df = opt_df[mask]
+                        # mask = (fut_df['Time'] >= 84500000000)
+                        # fut_df = fut_df[mask]
+                        # mask = (opt_df['Time'] >= 84500000000)
+                        # opt_df = opt_df[mask]
                         # calculate theoretical settlement price from future data
                         # t_year = int(str(opt_crnt[2])[0:4])
                         # t_month = int(str(opt_crnt[2])[4:6])
@@ -194,12 +194,14 @@ if __name__ == '__main__':
                             'Volume', 'LastTime'],axis=1)
                         fut_df_60 = fut_df_60.rename(columns={'Last':'Future_last'})
                         fut_df_60 = fut_df_60.sort_values(by=['Time'])
+                        fut_df_60 = fut_df_60.set_index('Time')
                         opt_df = opt_df.sort_values(by=['Time'])
-                        merge_df = pd.merge(opt_df,fut_df_60,how='left',on='Time',sort=True).fillna(method='ffill')
+                        opt_df = opt_df.set_index('Time')
+                        merge_df = pd.merge(opt_df,fut_df_60,how='outer',on='Time',left_index=True, right_index=True,sort=True).fillna(method='ffill')
                         merge_df = merge_df.dropna(axis = 0)
                         merge_df['Time'] = merge_df['Time'].astype(int)
                         # remove duplicate value after merging
-                        opt_time_l = list(opt_df['Time'])
+                        opt_time_l = list(opt_df.index)
                         for i in merge_df.index:
                             if merge_df.loc[i,'Time'] not in opt_time_l:
                                 merge_df = merge_df.drop(i,axis=0)
