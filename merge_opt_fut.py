@@ -197,7 +197,7 @@ if __name__ == '__main__':
                         fut_df_60 = fut_df_60.set_index('Time')
                         opt_df = opt_df.sort_values(by=['Time'])
                         opt_df = opt_df.set_index('Time')
-                        merge_df = pd.merge(opt_df,fut_df_60,how='outer',on='Time',left_index=True, right_index=True,sort=True).fillna(method='ffill')
+                        merge_df = pd.merge(opt_df,fut_df_60,how='outer',left_index=True, right_index=True).fillna(method='ffill')
                         merge_df = merge_df.dropna(axis = 0)
                         merge_df['Time'] = merge_df['Time'].astype(int)
                         # remove duplicate value after merging
