@@ -147,16 +147,9 @@ if __name__ == '__main__':
                         # if opt_crnt[0] == 'put':
                         #     continue
                         # import corresponding future price information and historical volatility
-                        c = calendar.Calendar(firstweekday=calendar.SUNDAY)
-                        monthcal = c.monthdatescalendar(d.year,d.month)
-                        third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == d.month][2]
-                        if d.day > third_wed.day:
-                            if d.month == 12:
-                                fut_code ='{}{}{}'.format(fut,info_df.loc[1,'code'],str(d.year+1)[3]) #換月
-                            else:
-                                fut_code ='{}{}{}'.format(fut,info_df.loc[d.month+1,'code'],str(d.year)[3])
-                        else:
-                            fut_code ='{}{}{}'.format(fut,info_df.loc[d.month,'code'],str(d.year)[3])
+                        y = str(opt_crnt[2])[3]
+                        m = int(str(opt_crnt[2])[4:6])
+                        fut_code ='{}{}{}'.format(fut,info_df.loc[m,'code'],y)
                         if not os.path.isfile(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv'):
                             print('for option',opt_code + ',','future price data is missing.')
                             with open(in_path + '/future_missing.csv', "w") as csvfile:
@@ -204,6 +197,11 @@ if __name__ == '__main__':
                         opt_df = opt_df.sort_values(by=['Time'])
                         merge_df = pd.merge(opt_df,fut_df_60,how='left',on='Time',sort=True).fillna(method='ffill')
                         merge_df = merge_df.dropna(axis = 0)
+                        # remove duplicate value after merging
+                        opt_time_l = list(opt_df['Time'])
+                        for i in merge_df.index:
+                            if merge_df.loc[i,'Time'] not in opt_time_l:
+                                merge_df = merge_df.drop(i,axis=0)
                         # 調整履約價格
                         if fut_df_60.tail(1)['Future_last'].values[0]/opt_crnt[1] > 3:
                             opt_crnt[1] = opt_crnt[1]/10
