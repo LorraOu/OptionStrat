@@ -194,12 +194,10 @@ if __name__ == '__main__':
                             'ASKSZ2', 'ASK3', 'ASKSZ3', 'ASK4', 'ASKSZ4', 'ASK5', 'ASKSZ5',
                             'Volume', 'LastTime'],axis=1)
                         fut_df_60 = fut_df_60.rename(columns={'Last':'Future_last'})
-                        fut_df_60 = fut_df_60.set_index('Time')
-                        opt_df = opt_df.set_index('Time')
-                        print('merge option and future')
-                        merge_df = pd.merge(opt_df,fut_df_60,how='outer',left_index=True, right_index=True).fillna(method='ffill')
+                        fut_df_60 = fut_df_60.sort_values(by=['Time'])
+                        opt_df = opt_df.sort_values(by=['Time'])
+                        merge_df = pd.merge(opt_df,fut_df_60,how='outer',sort=True,on='Time').fillna(method='ffill')
                         # merge_df = merge_df.dropna(axis = 0)
-                        merge_df = merge_df.reset_index(drop=False)
                         merge_df['Time'] = merge_df['Time'].astype(int)
                         # remove duplicate value after merging
                         opt_time_l = list(opt_df.index)
