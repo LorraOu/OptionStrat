@@ -121,7 +121,8 @@ if __name__ == '__main__':
             fut = opt + 'F'
             opt = opt + 'O'
         for date in dir_list:
-            if date in existed or (not cal.is_working_day(dt.strptime(date,'%Y%m%d'))):
+            d = dt.strptime(date,'%Y%m%d')
+            if date in existed or (not cal.is_working_day(d)):
                 continue
             for root,dirs,files in walk(f'/home/user/NasHistoryData/OptionCT/{date}'):
                 for f in files:
