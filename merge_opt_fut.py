@@ -38,6 +38,14 @@ def BS_put(S0,K,T,r,v):   ##  BS Put Option value
     p_value = K * np.exp(-r*T)*si.norm.cdf(-d2) -  S0*si.norm.cdf(-d1) 
     return p_value
 
+def BS_call_delta(S0,K,T,r,v):
+    d1 = (np.log(S0/K) + (r + 0.5*v**2)*T ) / (v*np.sqrt(T))
+    return si.norm.cdf(d1)
+
+def BS_put_delta(S0,K,T,r,v):
+    d1 = (np.log(S0/K) + (r + 0.5*v**2)*T ) / (v*np.sqrt(T))
+    return -si.norm.cdf(-d1) 
+
 def newton_vol_call(S, K, T, C, r, v):
     #S: spot price
     #K: strike price
@@ -233,13 +241,17 @@ if __name__ == '__main__':
                         for i in range(len(merge_df)):
                             value = merge_df.iloc[i]
                             if opt_crnt[0] == 'call':
+                                sigma_i = newton_vol_call(value[9],value[6],value[7],value[1],0.03,value[8])
                                 merge_df.loc[i,'Option_Price'] = BS_call(value[3],value[6],value[7],0.03,value[8])
                                 merge_df.loc[i,'Clearing_price'] = max(final_s - opt_crnt[1],0)
-                                merge_df.loc[i,'Implied_Volatility'] = newton_vol_call(value[9],value[6],value[7],value[1],0.03,value[8])
+                                merge_df.loc[i,'Implied_Volatility'] = sigma_i
+                                merge_df.loc[i,'Delta'] = BS_call_delta(value[3],value[6],value[7],0.03,sigma_i)
                             else:
+                                sigma_i = newton_vol_put(value[9],value[6],value[7],value[1],0.03,value[8])
                                 merge_df.loc[i,'Option_Price'] = BS_put(value[3],value[6],value[7],0.03,value[8])
                                 merge_df.loc[i,'Clearing_price'] = max(opt_crnt[1] - final_s,0)
-                                merge_df.loc[i,'Implied_Volatility'] = newton_vol_put(value[9],value[6],value[7],value[1],0.03,value[8])
+                                merge_df.loc[i,'Implied_Volatility'] = sigma_i
+                                merge_df.loc[i,'Delta'] = BS_put_delta(value[3],value[6],value[7],0.03,sigma_i)
                         if len(merge_df) == 0:
                             print('Discard',opt_code,'because no effective transaction is recorded (very likely due to missing values)')
                             continue
