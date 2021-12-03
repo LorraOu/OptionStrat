@@ -139,7 +139,7 @@ if __name__ == '__main__':
                     if opt in f:
                         if count > 3:
                             count = 0
-                            continue
+                            break
                         if os.path.isfile(in_path + f'/option_codes/{opt}.csv'):
                             option_df = pd.read_csv(in_path + f'/option_codes/{opt}.csv')
                             option_df = option_df.set_index('Code')
