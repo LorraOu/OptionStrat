@@ -99,7 +99,7 @@ if __name__ == '__main__':
     # 更新期貨資料和歷史波動度
     # future_day_price.future_day_price()
     # future_day_price.hist_vol()
-    data_date = [dt(2021,11,16)] #sample date
+    data_date = [dt(2021,7,20)] #sample date
     count = 0
 
     print('merging future and option price data...')

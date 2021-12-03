@@ -108,11 +108,11 @@ if __name__ == '__main__':
             date_list.append(third_wed)
     data_date = []
     for d in date_list:
-        data_date.append(d)
+        data_date.append(dt(d.year,d.month,d.day))
         delta = timedelta(days=1)
         for i in range(7):
             d = d - delta
-            data_date.append(d)
+            data_date.append(dt(d.year,d.month,d.day))
     data_date.sort()
 
     print('merging future and option price data...')
@@ -121,16 +121,11 @@ if __name__ == '__main__':
     info_df = pd.DataFrame(info_list)
     info_df = info_df.set_index('expiry_month')
     opt_path = '/home/user/NasHistoryData/OptionCT'
-    existed = []
     dir_list = []
     for root,dirs,files in walk('/home/user/NasHistoryData/OptionCT'):
         for d in dirs:
             if len(d) == 8:
                 dir_list.append(d)
-    for root,dirs,files in walk('/home/user/NasPublic/Option_Data/Price'):
-        for d in dirs:
-            if len(d) == 8:
-                existed.append(d)
     # opt_list = ['CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB', 'TX', 'TE', 'TF']
     opt_list = ['TX', 'TE', 'TF','CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB']
     for opt in opt_list:
@@ -145,7 +140,7 @@ if __name__ == '__main__':
             opt = opt + 'O'
         for d in data_date:
             date = dt.strftime(d,'%Y%m%d')
-            if date in existed or (not cal.is_working_day(d)):
+            if not cal.is_working_day(d):
                 continue
             for root,dirs,files in walk(f'/home/user/NasHistoryData/OptionCT/{date}'):
                 for f in files:
@@ -163,6 +158,9 @@ if __name__ == '__main__':
                         print('Processing option',f,date,'expire on',opt_crnt[2])
                         opt_df = pd.read_csv(opt_path + f'/{date}/{opt_code}.csv')
                         opt_df = opt_df[opt_df['Tick']!=0]
+                        # 如果之前有做過就跳過
+                        if os.path.isfile(f'/home/user/NasPublic/Option_Data/Price/{opt_code}_{date[0:4]}-{date[4:6]}-{date[6:8]}.csv'):
+                            continue
                         # 只做到期前一個禮拜的資料
                         if len(opt_df) == 0:
                             print('Option no transaction on',date)
