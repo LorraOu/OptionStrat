@@ -131,14 +131,14 @@ if __name__ == '__main__':
             fut = opt + 'F'
             opt = opt + 'O'
         for d in data_date:
-            if count > 3:
-                continue
             date = dt.strftime(d,'%Y%m%d')
             if not cal.is_working_day(d):
                 continue
             for root,dirs,files in walk(f'/home/user/NasHistoryData/OptionCT/{date}'):
                 for f in files:
                     if opt in f:
+                        if count > 3:
+                            continue
                         if os.path.isfile(in_path + f'/option_codes/{opt}.csv'):
                             option_df = pd.read_csv(in_path + f'/option_codes/{opt}.csv')
                             option_df = option_df.set_index('Code')
