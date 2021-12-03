@@ -99,6 +99,21 @@ if __name__ == '__main__':
     # 更新期貨資料和歷史波動度
     # future_day_price.future_day_price()
     # future_day_price.hist_vol()
+    date_list = []
+    c = calendar.Calendar(firstweekday=calendar.SUNDAY)
+    for year in range(2020,2022,1):
+        for month in range(1,13,1):
+            monthcal = c.monthdatescalendar(year,month)
+            third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == month][2]
+            date_list.append(third_wed)
+    data_date = []
+    for d in date_list:
+        data_date.append(d)
+        delta = timedelta(days=1)
+        for i in range(7):
+            d = d - delta
+            data_date.append(d)
+    data_date.sort()
 
     print('merging future and option price data...')
     #merge選擇權資料和現貨價格
@@ -128,8 +143,8 @@ if __name__ == '__main__':
         else:
             fut = opt + 'F'
             opt = opt + 'O'
-        for date in dir_list:
-            d = dt.strptime(date,'%Y%m%d')
+        for d in data_date:
+            date = dt.strftime(d,'%Y%m%d')
             if date in existed or (not cal.is_working_day(d)):
                 continue
             for root,dirs,files in walk(f'/home/user/NasHistoryData/OptionCT/{date}'):
@@ -148,6 +163,7 @@ if __name__ == '__main__':
                         print('Processing option',f,date,'expire on',opt_crnt[2])
                         opt_df = pd.read_csv(opt_path + f'/{date}/{opt_code}.csv')
                         opt_df = opt_df[opt_df['Tick']!=0]
+                        # 只做到期前一個禮拜的資料
                         if len(opt_df) == 0:
                             print('Option no transaction on',date)
                             continue
