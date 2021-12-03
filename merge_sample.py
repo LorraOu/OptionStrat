@@ -138,6 +138,7 @@ if __name__ == '__main__':
                 for f in files:
                     if opt in f:
                         if count > 3:
+                            count = 0
                             continue
                         if os.path.isfile(in_path + f'/option_codes/{opt}.csv'):
                             option_df = pd.read_csv(in_path + f'/option_codes/{opt}.csv')
