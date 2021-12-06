@@ -92,7 +92,7 @@ def newton_vol_put(S, K, T, P, r, v):
             break
     return sigma
 
-def create_file(d = dt):
+def create_file(yr,mn,dy):
     print('merging future and option price data...')
     #merge選擇權資料和現貨價格
     info_list = {'code': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'], 'expiry_month': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
@@ -116,7 +116,7 @@ def create_file(d = dt):
         else:
             fut = opt + 'F'
             opt = opt + 'O'
-            
+        d = dt(yr,mn,dy)
         date = dt.strftime(d,'%Y%m%d')
         if not cal.is_working_day(d):
             continue
@@ -299,6 +299,6 @@ if __name__ == '__main__':
     data_date.sort()
     data_date = data_date[30:]
 
-    create_file(data_date[1])
+    create_file(data_date[0].year,data_date[0].month,data_date[0].day)
 
     
