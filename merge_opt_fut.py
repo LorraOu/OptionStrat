@@ -114,6 +114,7 @@ if __name__ == '__main__':
             for i in range(7):
                 d = d - delta
                 data_date.append(dt(d.year,d.month,d.day))
+    print(data_date)
     data_date.sort()
 
     print('merging future and option price data...')
