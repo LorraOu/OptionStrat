@@ -298,10 +298,11 @@ if __name__ == '__main__':
             data_date.append(dt(d.year,d.month,d.day))
     data_date.sort()
     data_date = data_date[30:]
-
-    pool = mp.Pool(processes=4)
-    res = pool.map(create_file, data_date)
-    print(res)
+    for d in data_date:
+        create_file(d)
+    # pool = mp.Pool(processes=4)
+    # res = pool.map(create_file, data_date)
+    # print(res)
     
 
     
