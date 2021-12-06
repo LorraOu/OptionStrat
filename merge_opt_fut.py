@@ -116,164 +116,164 @@ def create_file(d = dt):
         else:
             fut = opt + 'F'
             opt = opt + 'O'
-        for d in data_date:
-            date = dt.strftime(d,'%Y%m%d')
-            if not cal.is_working_day(d):
-                continue
-            for root,dirs,files in walk(f'/home/user/NasHistoryData/OptionCT/{date}'):
-                for f in files:
-                    if opt in f:
-                        if os.path.isfile(in_path + f'/option_codes/{opt}.csv'):
-                            option_df = pd.read_csv(in_path + f'/option_codes/{opt}.csv')
-                            option_df = option_df.set_index('Code')
-                        else:
-                            print('error: file options.csv not found.')
-                            print('program closing...')
-                            exit(1)
-                        opt_code = f.split('.')[0]
-                        # get k and delivery date
-                        opt_crnt = option_df.loc[opt_code]
-                        print('Processing option',f,date,'expire on',opt_crnt[2])
-                        opt_df = pd.read_csv(opt_path + f'/{date}/{opt_code}.csv')
-                        opt_df = opt_df[opt_df['Tick']!=0]
-                        # 如果之前有做過就跳過
-                        if os.path.isdir(f'/home/user/NasPublic/Option_Data/Price/{date}/{opt_code}_{date[0:4]}-{date[4:6]}-{date[6:8]}.csv'):
-                            continue
-                        # 只做到期前一個禮拜的資料
-                        if len(opt_df) == 0:
-                            print('Option no transaction on',date)
-                            continue
-                        # 先做call option
-                        # if opt_crnt[0] == 'put':
-                        #     continue
-                        # import corresponding future price information and historical volatility
-                        y = str(opt_crnt[2])[3]
-                        m = int(str(opt_crnt[2])[4:6])
-                        fut_code ='{}{}{}'.format(fut,info_df.loc[m,'code'],y)
-                        print('Get future price from contract',fut_code)
-                        if not os.path.isfile(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv'):
-                            print('for option',opt_code + ',','future price data is missing.')
-                            with open(in_path + '/future_missing.csv', "w") as csvfile:
-                                spamwriter = csv.writer(csvfile, delimiter=',')
-                                spamwriter.writerow([date,opt_code,fut_code])
-                            continue
-                        fut_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
-                        fut_his_v = pd.read_csv(f'/home/user/Future_OHLC/{fut}_vol.csv',dtype={"Date": str})
-                        fut_his_v = fut_his_v.set_index('Date')
-                        # 去除試搓價格
-                        # mask = (fut_df['Time'] >= 84500000000)
-                        # fut_df = fut_df[mask]
-                        # mask = (opt_df['Time'] >= 84500000000)
-                        # opt_df = opt_df[mask]
-                        # calculate theoretical settlement price from future data
-                        # t_year = int(str(opt_crnt[2])[0:4])
-                        # t_month = int(str(opt_crnt[2])[4:6])
-                        # t_day = int(str(opt_crnt[2])[6:8])
-                        # monthcal = c.monthdatescalendar(t_year,t_month)
-                        # third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == t_month][2]
-                        # fut_code ='{}{}{}'.format(fut,info_df.loc[t_month,'code'],str(t_year)[3])
-                        # print('loading future settlement price from date', opt_crnt[2], fut_code)
-                        # if not os.path.isfile(f'/home/user/NasHistoryData/FutureCT/{opt_crnt[2]}/{fut_code}.csv'):
-                        #     print('for option',opt_code + ',','settlement future price data is missing.')
-                        #     continue
-                        # else:
-                        #     settle_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
-                        #     final_s = int(settle_df.loc[len(settle_df)-1,'Last'])
+            
+        date = dt.strftime(d,'%Y%m%d')
+        if not cal.is_working_day(d):
+            continue
+        for root,dirs,files in walk(f'/home/user/NasHistoryData/OptionCT/{date}'):
+            for f in files:
+                if opt in f:
+                    if os.path.isfile(in_path + f'/option_codes/{opt}.csv'):
+                        option_df = pd.read_csv(in_path + f'/option_codes/{opt}.csv')
+                        option_df = option_df.set_index('Code')
+                    else:
+                        print('error: file options.csv not found.')
+                        print('program closing...')
+                        exit(1)
+                    opt_code = f.split('.')[0]
+                    # get k and delivery date
+                    opt_crnt = option_df.loc[opt_code]
+                    print('Processing option',f,date,'expire on',opt_crnt[2])
+                    opt_df = pd.read_csv(opt_path + f'/{date}/{opt_code}.csv')
+                    opt_df = opt_df[opt_df['Tick']!=0]
+                    # 如果之前有做過就跳過
+                    if os.path.isdir(f'/home/user/NasPublic/Option_Data/Price/{date}/{opt_code}_{date[0:4]}-{date[4:6]}-{date[6:8]}.csv'):
+                        continue
+                    # 只做到期前一個禮拜的資料
+                    if len(opt_df) == 0:
+                        print('Option no transaction on',date)
+                        continue
+                    # 先做call option
+                    # if opt_crnt[0] == 'put':
+                    #     continue
+                    # import corresponding future price information and historical volatility
+                    y = str(opt_crnt[2])[3]
+                    m = int(str(opt_crnt[2])[4:6])
+                    fut_code ='{}{}{}'.format(fut,info_df.loc[m,'code'],y)
+                    print('Get future price from contract',fut_code)
+                    if not os.path.isfile(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv'):
+                        print('for option',opt_code + ',','future price data is missing.')
+                        with open(in_path + '/future_missing.csv', "w") as csvfile:
+                            spamwriter = csv.writer(csvfile, delimiter=',')
+                            spamwriter.writerow([date,opt_code,fut_code])
+                        continue
+                    fut_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
+                    fut_his_v = pd.read_csv(f'/home/user/Future_OHLC/{fut}_vol.csv',dtype={"Date": str})
+                    fut_his_v = fut_his_v.set_index('Date')
+                    # 去除試搓價格
+                    # mask = (fut_df['Time'] >= 84500000000)
+                    # fut_df = fut_df[mask]
+                    # mask = (opt_df['Time'] >= 84500000000)
+                    # opt_df = opt_df[mask]
+                    # calculate theoretical settlement price from future data
+                    # t_year = int(str(opt_crnt[2])[0:4])
+                    # t_month = int(str(opt_crnt[2])[4:6])
+                    # t_day = int(str(opt_crnt[2])[6:8])
+                    # monthcal = c.monthdatescalendar(t_year,t_month)
+                    # third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == t_month][2]
+                    # fut_code ='{}{}{}'.format(fut,info_df.loc[t_month,'code'],str(t_year)[3])
+                    # print('loading future settlement price from date', opt_crnt[2], fut_code)
+                    # if not os.path.isfile(f'/home/user/NasHistoryData/FutureCT/{opt_crnt[2]}/{fut_code}.csv'):
+                    #     print('for option',opt_code + ',','settlement future price data is missing.')
+                    #     continue
+                    # else:
+                    #     settle_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
+                    #     final_s = int(settle_df.loc[len(settle_df)-1,'Last'])
 
-                        #merge option and future price; record future price every 1 minute
-                        fut_df_60 = pd.DataFrame(columns=fut_df.columns)
-                        step = 25
-                        for i in range(0,len(fut_df),step):
-                            fut_df_60 = fut_df_60.append(fut_df.iloc[i],ignore_index=True)
-                        fut_df_60 = fut_df_60.drop(['Vol','BIDSZ1', 'BID2', 'BIDSZ2', 'BID3',
-                            'BIDSZ3', 'BID4', 'BIDSZ4', 'BID5', 'BIDSZ5', 'ASKSZ1', 'ASK2',
-                            'ASKSZ2', 'ASK3', 'ASKSZ3', 'ASK4', 'ASKSZ4', 'ASK5', 'ASKSZ5', 'Tick',
-                            'Volume', 'LastTime'],axis=1)
-                        opt_df = opt_df.drop(['Vol', 'BID1', 'BIDSZ1', 'BID2', 'BIDSZ2', 'BID3',
-                            'BIDSZ3', 'BID4', 'BIDSZ4', 'BID5', 'BIDSZ5', 'ASK1', 'ASKSZ1', 'ASK2',
-                            'ASKSZ2', 'ASK3', 'ASKSZ3', 'ASK4', 'ASKSZ4', 'ASK5', 'ASKSZ5',
-                            'Volume', 'LastTime'],axis=1)
-                        fut_df_60 = fut_df_60.rename(columns={'Last':'Future_last'})
-                        fut_df_60 = fut_df_60.sort_values(by=['Time'])
-                        opt_df = opt_df.sort_values(by=['Time'])
-                        merge_df = pd.merge(opt_df,fut_df_60,how='outer',sort=True,on='Time').fillna(method='ffill')
-                        # merge_df = merge_df.dropna(axis = 0)
-                        merge_df['Time'] = merge_df['Time'].astype(int)
-                        # remove duplicate value after merging
-                        opt_time_l = list(opt_df['Time'])
-                        for i in merge_df.index:
-                            if merge_df.loc[i,'Time'] not in opt_time_l:
-                                merge_df = merge_df.drop(i,axis=0)
-                        # 調整履約價格
-                        print('calculate option price')
-                        if fut_df_60.tail(1)['Future_last'].values[0]/opt_crnt[1] > 3:
-                            opt_crnt[1] = opt_crnt[1]/10
-                        merge_df['K'] = opt_crnt[1]
-                        t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
-                        merge_df['T'] = t_delta.days/252
-                        # 紀錄期貨在結算當天收盤價
+                    #merge option and future price; record future price every 1 minute
+                    fut_df_60 = pd.DataFrame(columns=fut_df.columns)
+                    step = 25
+                    for i in range(0,len(fut_df),step):
+                        fut_df_60 = fut_df_60.append(fut_df.iloc[i],ignore_index=True)
+                    fut_df_60 = fut_df_60.drop(['Vol','BIDSZ1', 'BID2', 'BIDSZ2', 'BID3',
+                        'BIDSZ3', 'BID4', 'BIDSZ4', 'BID5', 'BIDSZ5', 'ASKSZ1', 'ASK2',
+                        'ASKSZ2', 'ASK3', 'ASKSZ3', 'ASK4', 'ASKSZ4', 'ASK5', 'ASKSZ5', 'Tick',
+                        'Volume', 'LastTime'],axis=1)
+                    opt_df = opt_df.drop(['Vol', 'BID1', 'BIDSZ1', 'BID2', 'BIDSZ2', 'BID3',
+                        'BIDSZ3', 'BID4', 'BIDSZ4', 'BID5', 'BIDSZ5', 'ASK1', 'ASKSZ1', 'ASK2',
+                        'ASKSZ2', 'ASK3', 'ASKSZ3', 'ASK4', 'ASKSZ4', 'ASK5', 'ASKSZ5',
+                        'Volume', 'LastTime'],axis=1)
+                    fut_df_60 = fut_df_60.rename(columns={'Last':'Future_last'})
+                    fut_df_60 = fut_df_60.sort_values(by=['Time'])
+                    opt_df = opt_df.sort_values(by=['Time'])
+                    merge_df = pd.merge(opt_df,fut_df_60,how='outer',sort=True,on='Time').fillna(method='ffill')
+                    # merge_df = merge_df.dropna(axis = 0)
+                    merge_df['Time'] = merge_df['Time'].astype(int)
+                    # remove duplicate value after merging
+                    opt_time_l = list(opt_df['Time'])
+                    for i in merge_df.index:
+                        if merge_df.loc[i,'Time'] not in opt_time_l:
+                            merge_df = merge_df.drop(i,axis=0)
+                    # 調整履約價格
+                    print('calculate option price')
+                    if fut_df_60.tail(1)['Future_last'].values[0]/opt_crnt[1] > 3:
+                        opt_crnt[1] = opt_crnt[1]/10
+                    merge_df['K'] = opt_crnt[1]
+                    t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
+                    merge_df['T'] = t_delta.days/252
+                    # 紀錄期貨在結算當天收盤價
+                    try:
+                        final_s = fut_his_v.loc[str(opt_crnt[2]),'Close']
+                    except:
+                        print('Future settlement price not found.')
+                        continue
+                    # locate historical volatility
+                    t_d = d
+                    t_date = date
+                    while True:
                         try:
-                            final_s = fut_his_v.loc[str(opt_crnt[2]),'Close']
+                            merge_df['V'] = fut_his_v.loc[t_date,'hist_vol']
+                            break
                         except:
-                            print('Future settlement price not found.')
-                            continue
-                        # locate historical volatility
-                        t_d = d
-                        t_date = date
-                        while True:
-                            try:
-                                merge_df['V'] = fut_his_v.loc[t_date,'hist_vol']
-                                break
-                            except:
-                                t_d = t_d - timedelta(days=1)
-                                t_date = dt.strftime(t_d,'%Y%m%d')
-                        merge_df['S'] = (merge_df['BID1'] + merge_df['ASK1'])/2
-                        merge_df['S*'] = final_s
-                        merge_df = merge_df.reset_index(drop=True)
-                        for i in range(len(merge_df)):
-                            value = merge_df.iloc[i]
-                            if opt_crnt[0] == 'call':
-                                sigma_i = newton_vol_call(value[9],value[6],value[7],value[1],0.03,value[8])
-                                merge_df.loc[i,'Option_Price'] = BS_call(value[3],value[6],value[7],0.03,value[8])
-                                merge_df.loc[i,'Clearing_price'] = max(final_s - opt_crnt[1],0)
-                                merge_df.loc[i,'Implied_Volatility'] = sigma_i
-                                merge_df.loc[i,'Delta'] = BS_call_delta(value[3],value[6],value[7],0.03,sigma_i)
-                            else:
-                                sigma_i = newton_vol_put(value[9],value[6],value[7],value[1],0.03,value[8])
-                                merge_df.loc[i,'Option_Price'] = BS_put(value[3],value[6],value[7],0.03,value[8])
-                                merge_df.loc[i,'Clearing_price'] = max(opt_crnt[1] - final_s,0)
-                                merge_df.loc[i,'Implied_Volatility'] = sigma_i
-                                merge_df.loc[i,'Delta'] = BS_put_delta(value[3],value[6],value[7],0.03,sigma_i)
-                        if len(merge_df) == 0:
-                            print('Discard',opt_code,'because no effective transaction is recorded (very likely due to missing values)')
-                            continue
-                        merge_df['Last-Clearing'] = merge_df['Last'] - merge_df['Clearing_price']
-                        merge_df['Option_Price-Clearing'] = merge_df['Option_Price'] - merge_df['Clearing_price']
-                        
-                        # output merge file
-                        output_folder = '/home/user/NasPublic/Option_Data/Price'
-                        try:
-                            if os.path.isdir(output_folder):
-                                print('Folder exist: ' + output_folder)
-                            else:
-                                print('Create folder: ' + output_folder)
-                                os.mkdir(output_folder)
-                        except OSError:
-                            print('Creation of the directory {} failed'.format(output_folder))
-                            exit(1)
-                        output_folder = output_folder + f'/{date}'
-                        try:
-                            if os.path.isdir(output_folder):
-                                print('Folder exist: ' + output_folder)
-                            else:
-                                print('Create folder: ' + output_folder)
-                                os.mkdir(output_folder)
-                        except OSError:
-                            print('Creation of the directory {} failed'.format(output_folder))
-                            exit(1)
-                        output_path = output_folder + f'/{opt_code}_{date[0:4]}-{date[4:6]}-{date[6:8]}.csv'
-                        merge_df.to_csv(output_path,index=False)
-                        print('Output:',output_path)
+                            t_d = t_d - timedelta(days=1)
+                            t_date = dt.strftime(t_d,'%Y%m%d')
+                    merge_df['S'] = (merge_df['BID1'] + merge_df['ASK1'])/2
+                    merge_df['S*'] = final_s
+                    merge_df = merge_df.reset_index(drop=True)
+                    for i in range(len(merge_df)):
+                        value = merge_df.iloc[i]
+                        if opt_crnt[0] == 'call':
+                            sigma_i = newton_vol_call(value[9],value[6],value[7],value[1],0.03,value[8])
+                            merge_df.loc[i,'Option_Price'] = BS_call(value[3],value[6],value[7],0.03,value[8])
+                            merge_df.loc[i,'Clearing_price'] = max(final_s - opt_crnt[1],0)
+                            merge_df.loc[i,'Implied_Volatility'] = sigma_i
+                            merge_df.loc[i,'Delta'] = BS_call_delta(value[3],value[6],value[7],0.03,sigma_i)
+                        else:
+                            sigma_i = newton_vol_put(value[9],value[6],value[7],value[1],0.03,value[8])
+                            merge_df.loc[i,'Option_Price'] = BS_put(value[3],value[6],value[7],0.03,value[8])
+                            merge_df.loc[i,'Clearing_price'] = max(opt_crnt[1] - final_s,0)
+                            merge_df.loc[i,'Implied_Volatility'] = sigma_i
+                            merge_df.loc[i,'Delta'] = BS_put_delta(value[3],value[6],value[7],0.03,sigma_i)
+                    if len(merge_df) == 0:
+                        print('Discard',opt_code,'because no effective transaction is recorded (very likely due to missing values)')
+                        continue
+                    merge_df['Last-Clearing'] = merge_df['Last'] - merge_df['Clearing_price']
+                    merge_df['Option_Price-Clearing'] = merge_df['Option_Price'] - merge_df['Clearing_price']
+                    
+                    # output merge file
+                    output_folder = '/home/user/NasPublic/Option_Data/Price'
+                    try:
+                        if os.path.isdir(output_folder):
+                            print('Folder exist: ' + output_folder)
+                        else:
+                            print('Create folder: ' + output_folder)
+                            os.mkdir(output_folder)
+                    except OSError:
+                        print('Creation of the directory {} failed'.format(output_folder))
+                        exit(1)
+                    output_folder = output_folder + f'/{date}'
+                    try:
+                        if os.path.isdir(output_folder):
+                            print('Folder exist: ' + output_folder)
+                        else:
+                            print('Create folder: ' + output_folder)
+                            os.mkdir(output_folder)
+                    except OSError:
+                        print('Creation of the directory {} failed'.format(output_folder))
+                        exit(1)
+                    output_path = output_folder + f'/{opt_code}_{date[0:4]}-{date[4:6]}-{date[6:8]}.csv'
+                    merge_df.to_csv(output_path,index=False)
+                    print('Output:',output_path)
 
 if __name__ == '__main__':
     # 分析選擇權代碼
