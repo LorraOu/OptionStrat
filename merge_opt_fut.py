@@ -113,7 +113,6 @@ if __name__ == '__main__':
         for i in range(7):
             d = d - delta
             data_date.append(dt(d.year,d.month,d.day))
-    print(data_date)
     data_date.sort()
     data_date = data_date[30:]
 
@@ -161,7 +160,7 @@ if __name__ == '__main__':
                         opt_df = pd.read_csv(opt_path + f'/{date}/{opt_code}.csv')
                         opt_df = opt_df[opt_df['Tick']!=0]
                         # 如果之前有做過就跳過
-                        if os.path.isdir(f'/home/user/NasPublic/Option_Data/Price/{date}'):
+                        if os.path.isdir(f'/home/user/NasPublic/Option_Data/Price/{date}/{opt_code}_{date[0:4]}-{date[4:6]}-{date[6:8]}.csv'):
                             continue
                         # 只做到期前一個禮拜的資料
                         if len(opt_df) == 0:
