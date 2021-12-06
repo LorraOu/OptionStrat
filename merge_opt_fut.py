@@ -204,7 +204,7 @@ if __name__ == '__main__':
 
                         #merge option and future price; record future price every 1 minute
                         fut_df_60 = pd.DataFrame(columns=fut_df.columns)
-                        step = 10
+                        step = 25
                         for i in range(0,len(fut_df),step):
                             fut_df_60 = fut_df_60.append(fut_df.iloc[i],ignore_index=True)
                         fut_df_60 = fut_df_60.drop(['Vol','BIDSZ1', 'BID2', 'BIDSZ2', 'BID3',
