@@ -108,16 +108,6 @@ if __name__ == '__main__':
     info_df = pd.DataFrame(info_list)
     info_df = info_df.set_index('expiry_month')
     opt_path = '/home/user/NasHistoryData/OptionCT'
-    existed = []
-    dir_list = []
-    for root,dirs,files in walk('/home/user/NasHistoryData/OptionCT'):
-        for d in dirs:
-            if len(d) == 8:
-                dir_list.append(d)
-    for root,dirs,files in walk('/home/user/NasPublic/Option_Data/Price'):
-        for d in dirs:
-            if len(d) == 8:
-                existed.append(d)
     # opt_list = ['CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB', 'TX', 'TE', 'TF']
     opt_list = ['TE', 'TF','CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB']
     for opt in opt_list:
@@ -220,7 +210,7 @@ if __name__ == '__main__':
                                 merge_df = merge_df.drop(i,axis=0)
                         # 調整履約價格
                         print('calculate option price')
-                        while fut_df_60.tail(1)['Future_last'].values[0]/opt_crnt[1] > 2:
+                        while opt_crnt[1]/fut_df_60.tail(1)['Future_last'].values[0] > 2:
                             opt_crnt[1] = opt_crnt[1]/10
                         merge_df['K'] = opt_crnt[1]
                         t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d

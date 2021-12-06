@@ -201,7 +201,7 @@ def create_file(date):
                             merge_df = merge_df.drop(i,axis=0)
                     # 調整履約價格
                     print('calculate option price')
-                    while fut_df_60.tail(1)['Future_last'].values[0]/opt_crnt[1] > 2:
+                    while opt_crnt[1]/fut_df_60.tail(1)['Future_last'].values[0] > 2:
                             opt_crnt[1] = opt_crnt[1]/10
                     merge_df['K'] = opt_crnt[1]
                     t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
