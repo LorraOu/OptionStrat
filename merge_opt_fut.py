@@ -201,8 +201,8 @@ def create_file(date):
                             merge_df = merge_df.drop(i,axis=0)
                     # 調整履約價格
                     print('calculate option price')
-                    if fut_df_60.tail(1)['Future_last'].values[0]/opt_crnt[1] > 3:
-                        opt_crnt[1] = opt_crnt[1]/10
+                    while fut_df_60.tail(1)['Future_last'].values[0]/opt_crnt[1] > 2:
+                            opt_crnt[1] = opt_crnt[1]/10
                     merge_df['K'] = opt_crnt[1]
                     t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
                     merge_df['T'] = t_delta.days/252
@@ -293,7 +293,7 @@ if __name__ == '__main__':
     data_date = data_date[27:]
     # for d in data_date:
     #     create_file(d)
-    pool = mp.Pool(processes=4)
+    pool = mp.Pool()
     res = pool.map(create_file, data_date)
     print(res)
     
