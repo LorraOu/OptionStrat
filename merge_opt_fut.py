@@ -108,11 +108,12 @@ if __name__ == '__main__':
             date_list.append(third_wed)
     data_date = []
     for d in date_list:
-        data_date.append(dt(d.year,d.month,d.day))
-        delta = timedelta(days=1)
-        for i in range(7):
-            d = d - delta
+        if dt(d.year,d.month,d.day) >= dt(2020,4,14):
             data_date.append(dt(d.year,d.month,d.day))
+            delta = timedelta(days=1)
+            for i in range(7):
+                d = d - delta
+                data_date.append(dt(d.year,d.month,d.day))
     data_date.sort()
 
     print('merging future and option price data...')
