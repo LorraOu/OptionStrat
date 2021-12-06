@@ -93,18 +93,13 @@ def newton_vol_put(S, K, T, P, r, v):
             break
     return sigma
 
-def create_file(d):
+def create_file(date):
     print('merging future and option price data...')
     #merge選擇權資料和現貨價格
     info_list = {'code': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'], 'expiry_month': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
     info_df = pd.DataFrame(info_list)
     info_df = info_df.set_index('expiry_month')
     opt_path = '/home/user/NasHistoryData/OptionCT'
-    dir_list = []
-    for root,dirs,files in walk('/home/user/NasHistoryData/OptionCT'):
-        for d in dirs:
-            if len(d) == 8:
-                dir_list.append(d)
     # opt_list = ['CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB', 'TX', 'TE', 'TF']
     opt_list = ['TX', 'TE', 'TF','CE', 'CF', 'CG', 'CH', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CQ', 'CR', 'CS', 'CZ', 'DC', 'DE', 'DF', 'DG', 'DH', 'DJ', 'DK', 'DL', 'DN', 'DO', 'DP', 'DQ', 'DS', 'DV', 'DW', 'DX', 'GI', 'GX', 'HC', 'IJ', 'LO', 'NY', 'NZ', 'OA', 'OB', 'OC', 'OJ', 'OK', 'OO', 'OZ', 'QB']
     for opt in opt_list:
@@ -117,7 +112,7 @@ def create_file(d):
         else:
             fut = opt + 'F'
             opt = opt + 'O'
-        date = dt.strftime(d,'%Y%m%d')
+        d = dt.strptime(date,'%Y%m%d')
         if not cal.is_working_day(d):
             continue
         for root,dirs,files in walk(f'/home/user/NasHistoryData/OptionCT/{date}'):
@@ -291,18 +286,16 @@ if __name__ == '__main__':
             date_list.append(third_wed)
     data_date = []
     for d in date_list:
-        data_date.append(dt(d.year,d.month,d.day))
-        delta = timedelta(days=1)
+        delta = timedelta(days=7)
         for i in range(7):
-            d = d - delta
-            data_date.append(dt(d.year,d.month,d.day))
-    data_date.sort()
-    data_date = data_date[30:]
-    for d in data_date:
-        create_file(d)
-    # pool = mp.Pool(processes=4)
-    # res = pool.map(create_file, data_date)
-    # print(res)
+            temp = d - delta + timedelta(days=i)
+            data_date.append(temp.strftime('%Y%m%d'))
+    data_date = data_date[27:]
+    # for d in data_date:
+    #     create_file(d)
+    pool = mp.Pool(processes=4)
+    res = pool.map(create_file, data_date)
+    print(res)
     
 
     
