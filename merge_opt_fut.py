@@ -92,30 +92,7 @@ def newton_vol_put(S, K, T, P, r, v):
             break
     return sigma
 
-if __name__ == '__main__':
-    # 分析選擇權代碼
-    # option_list.option_code()
-
-    # 更新期貨資料和歷史波動度
-    # future_day_price.future_day_price()
-    # future_day_price.hist_vol()
-    date_list = []
-    c = calendar.Calendar(firstweekday=calendar.SUNDAY)
-    for year in range(2020,2022,1):
-        for month in range(1,13,1):
-            monthcal = c.monthdatescalendar(year,month)
-            third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == month][2]
-            date_list.append(third_wed)
-    data_date = []
-    for d in date_list:
-        data_date.append(dt(d.year,d.month,d.day))
-        delta = timedelta(days=1)
-        for i in range(7):
-            d = d - delta
-            data_date.append(dt(d.year,d.month,d.day))
-    data_date.sort()
-    data_date = data_date[30:]
-
+def create_file(d = dt):
     print('merging future and option price data...')
     #merge選擇權資料和現貨價格
     info_list = {'code': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'], 'expiry_month': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
@@ -297,3 +274,31 @@ if __name__ == '__main__':
                         output_path = output_folder + f'/{opt_code}_{date[0:4]}-{date[4:6]}-{date[6:8]}.csv'
                         merge_df.to_csv(output_path,index=False)
                         print('Output:',output_path)
+
+if __name__ == '__main__':
+    # 分析選擇權代碼
+    # option_list.option_code()
+
+    # 更新期貨資料和歷史波動度
+    # future_day_price.future_day_price()
+    # future_day_price.hist_vol()
+    date_list = []
+    c = calendar.Calendar(firstweekday=calendar.SUNDAY)
+    for year in range(2020,2022,1):
+        for month in range(1,13,1):
+            monthcal = c.monthdatescalendar(year,month)
+            third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == month][2]
+            date_list.append(third_wed)
+    data_date = []
+    for d in date_list:
+        data_date.append(dt(d.year,d.month,d.day))
+        delta = timedelta(days=1)
+        for i in range(7):
+            d = d - delta
+            data_date.append(dt(d.year,d.month,d.day))
+    data_date.sort()
+    data_date = data_date[30:]
+
+    create_file(data_date[1])
+
+    
