@@ -68,7 +68,7 @@ def newton_vol_call(S, K, T, C, r, v):
             low = sigma
             sigma = (sigma + high) / 2
         
-        if abs(last_sig - sigma) < 0.00001:
+        if abs(last_sig - sigma) < 0.0001:
             break
     return sigma
 
@@ -88,7 +88,7 @@ def newton_vol_put(S, K, T, P, r, v):
             low = sigma
             sigma = (sigma + high) / 2
         
-        if abs(last_sig - sigma) < 0.00001:
+        if abs(last_sig - sigma) < 0.0001:
             break
     return sigma
 
