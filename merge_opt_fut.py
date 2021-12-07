@@ -156,8 +156,8 @@ def create_file(date):
                     fut_his_v = pd.read_csv(f'/home/user/Future_OHLC/{fut}_vol.csv',dtype={"Date": str})
                     fut_his_v = fut_his_v.set_index('Date')
                     # 去除試搓價格
-                    # mask = (fut_df['Time'] >= 84500000000)
-                    # fut_df = fut_df[mask]
+                    mask = (fut_df['Time'] >= 84500000000)
+                    fut_df = fut_df[mask]
                     # mask = (opt_df['Time'] >= 84500000000)
                     # opt_df = opt_df[mask]
                     # calculate theoretical settlement price from future data
@@ -287,7 +287,7 @@ if __name__ == '__main__':
     data_date = []
     for d in date_list:
         delta = timedelta(days=7)
-        for i in range(7):
+        for i in range(8):
             temp = d - delta + timedelta(days=i)
             data_date.append(temp.strftime('%Y%m%d'))
     data_date = data_date[27:]
