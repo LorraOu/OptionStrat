@@ -1,8 +1,6 @@
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
-import datetime
 from typing import final
-import option_list
 import future_day_price
 import option_list
 import pandas as pd
@@ -18,7 +16,8 @@ import csv
 import multiprocessing as mp
 from workalendar.asia import Taiwan
 cal = Taiwan()
-
+# merge_opt_fut.py為主程式，執行時會自動帶入另外兩個涵式庫
+# create_file() 會處理指定日期的選擇權資料
 
 #current file location
 in_path = str(pathlib.Path(__file__).parent.absolute())
@@ -47,7 +46,7 @@ def BS_put_delta(S0,K,T,r,v):
     d1 = (np.log(S0/K) + (r + 0.5*v**2)*T ) / (v*np.sqrt(T))
     return -si.norm.cdf(-d1) 
 
-def newton_vol_call(S, K, T, C, r, v):
+def newton_vol_call(S, K, T, C, r, v): ## 隱含波動度
     #S: spot price
     #K: strike price
     #T: time to maturity
@@ -113,11 +112,13 @@ def create_file(date):
             fut = opt + 'F'
             opt = opt + 'O'
         d = dt.strptime(date,'%Y%m%d')
+        # 排除非工作天的日期
         if not cal.is_working_day(d):
             continue
         for root,dirs,files in walk(f'/home/user/NasHistoryData/OptionCT/{date}'):
             for f in files:
                 if opt in f:
+                    # 檢查選擇權資料是否存在
                     if os.path.isfile(in_path + f'/option_codes/{opt}.csv'):
                         option_df = pd.read_csv(in_path + f'/option_codes/{opt}.csv')
                         option_df = option_df.set_index('Code')
@@ -125,8 +126,10 @@ def create_file(date):
                         print('error: file options.csv not found.')
                         print('program closing...')
                         exit(1)
+                    
+                    # 取得選擇權名稱作為檢索值
                     opt_code = f.split('.')[0]
-                    # get k and delivery date
+                    # 取得選擇權基本資料
                     opt_crnt = option_df.loc[opt_code]
                     print('Processing option',f,date,'expire on',opt_crnt[2])
                     opt_df = pd.read_csv(opt_path + f'/{date}/{opt_code}.csv')
@@ -134,14 +137,11 @@ def create_file(date):
                     # 如果之前有做過就跳過
                     if os.path.isfile(f'/home/user/NasPublic/Option_Data/Price/{date}/{opt_code}_{date[0:4]}-{date[4:6]}-{date[6:8]}.csv'):
                         continue
-                    # 只做到期前一個禮拜的資料
+                    # 若當日該選擇權並無交易則直接略過
                     if len(opt_df) == 0:
                         print('Option no transaction on',date)
                         continue
-                    # 先做call option
-                    # if opt_crnt[0] == 'put':
-                    #     continue
-                    # import corresponding future price information and historical volatility
+                    # 匯入對應之期貨價格和歷史波動度
                     y = str(opt_crnt[2])[3]
                     m = int(str(opt_crnt[2])[4:6])
                     fut_code ='{}{}{}'.format(fut,info_df.loc[m,'code'],y)
@@ -158,24 +158,8 @@ def create_file(date):
                     # 去除試搓價格
                     mask = (fut_df['Time'] >= 84500000000)
                     fut_df = fut_df[mask]
-                    # mask = (opt_df['Time'] >= 84500000000)
-                    # opt_df = opt_df[mask]
-                    # calculate theoretical settlement price from future data
-                    # t_year = int(str(opt_crnt[2])[0:4])
-                    # t_month = int(str(opt_crnt[2])[4:6])
-                    # t_day = int(str(opt_crnt[2])[6:8])
-                    # monthcal = c.monthdatescalendar(t_year,t_month)
-                    # third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == t_month][2]
-                    # fut_code ='{}{}{}'.format(fut,info_df.loc[t_month,'code'],str(t_year)[3])
-                    # print('loading future settlement price from date', opt_crnt[2], fut_code)
-                    # if not os.path.isfile(f'/home/user/NasHistoryData/FutureCT/{opt_crnt[2]}/{fut_code}.csv'):
-                    #     print('for option',opt_code + ',','settlement future price data is missing.')
-                    #     continue
-                    # else:
-                    #     settle_df = pd.read_csv(f'/home/user/NasHistoryData/FutureCT/{date}/{fut_code}.csv')
-                    #     final_s = int(settle_df.loc[len(settle_df)-1,'Last'])
 
-                    #merge option and future price; record future price every 1 minute
+                    # 合併選擇權和期貨資料，期貨因交易量大所以每30筆做subsample
                     fut_df_60 = pd.DataFrame(columns=fut_df.columns)
                     step = 30
                     for i in range(0,len(fut_df),step):
@@ -192,14 +176,13 @@ def create_file(date):
                     fut_df_60 = fut_df_60.sort_values(by=['Time'])
                     opt_df = opt_df.sort_values(by=['Time'])
                     merge_df = pd.merge(opt_df,fut_df_60,how='outer',sort=True,on='Time').fillna(method='ffill')
-                    # merge_df = merge_df.dropna(axis = 0)
                     merge_df['Time'] = merge_df['Time'].astype(int)
-                    # remove duplicate value after merging
+                    # 去除合併後非選擇權原本時間的資料
                     opt_time_l = list(opt_df['Time'])
                     for i in merge_df.index:
                         if merge_df.loc[i,'Time'] not in opt_time_l:
                             merge_df = merge_df.drop(i,axis=0)
-                    # 調整履約價格
+                    # 調整履約價格，由option_list得到的履約價有可能不是真正履約價（系統會預留小數點位置）
                     print('calculate option price')
                     while opt_crnt[1]/fut_df_60.tail(1)['Future_last'].values[0] > 2:
                             opt_crnt[1] = opt_crnt[1]/10
@@ -212,19 +195,23 @@ def create_file(date):
                     except:
                         print('Future settlement price not found.')
                         continue
-                    # locate historical volatility
+                    # 得到對應的歷史波動度資料
                     t_d = d
                     t_date = date
                     while True:
                         try:
+                            # 若當日無資料就會往前搜索
                             merge_df['V'] = fut_his_v.loc[t_date,'hist_vol']
                             break
                         except:
                             t_d = t_d - timedelta(days=1)
                             t_date = dt.strftime(t_d,'%Y%m%d')
+                    # 計算隱含波動度之現貨價格(S)及實際結算價格(S*)
                     merge_df['S'] = (merge_df['BID1'] + merge_df['ASK1'])/2
                     merge_df['S*'] = final_s
                     merge_df = merge_df.reset_index(drop=True)
+
+                    # 計算選擇權的理論價格、結算價、隱含波動度以及Delta
                     for i in range(len(merge_df)):
                         value = merge_df.iloc[i]
                         if opt_crnt[0] == 'call':
@@ -272,11 +259,13 @@ def create_file(date):
 
 if __name__ == '__main__':
     # 分析選擇權代碼
-    # option_list.option_code()
+    option_list.option_code()
 
     # 更新期貨資料和歷史波動度
-    # future_day_price.future_day_price()
-    # future_day_price.hist_vol()
+    future_day_price.future_day_price()
+    future_day_price.hist_vol()
+
+    # 建立資料所需日期
     date_list = []
     c = calendar.Calendar(firstweekday=calendar.SUNDAY)
     for year in range(2020,2022,1):
@@ -287,9 +276,10 @@ if __name__ == '__main__':
     data_date = []
     for d in date_list:
         data_date.append(d.strftime('%Y%m%d'))
+    # 因歷史波動度是rolling 15 天，所以前面幾筆資料會無法計算價格
     data_date = data_date[3:]
-    # for d in data_date:
-    #     create_file(d)
+
+    # 平行化運算
     pool = mp.Pool()
     res = pool.map(create_file, data_date)
     print(res)

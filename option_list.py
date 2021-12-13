@@ -7,8 +7,8 @@ import datetime
 import pathlib
 import csv
 import os
+# option_code()的用途為解析選擇權檔案名稱，建立選擇權基本資料表
 
-# option code to expiry_date
 def option_code():
     in_path = str(pathlib.Path(__file__).parent.absolute()) + '/option_codes'
     if not os.path.isdir(in_path):

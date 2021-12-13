@@ -10,6 +10,8 @@ import os
 from workalendar.asia import Taiwan
 cal = Taiwan()
 in_path = str(pathlib.Path(__file__).parent.absolute())
+# future_day_price()的用途為將期貨的日內資料轉為每日交易資料（開、高、低、收)
+# hist_vol()的用途為計算歷史波動度
 
 def future_day_price():
     print('Processing future daily price data...')
@@ -18,6 +20,7 @@ def future_day_price():
     info_df = pd.DataFrame(info_list)
     info_df = info_df.set_index('expiry_month')
 
+    # 資料庫中找出資料日期
     dir_list = []
     for root,dirs,files in walk('/home/user/NasHistoryData/FutureCT'):
         for d in dirs:
@@ -43,11 +46,15 @@ def future_day_price():
             fut_df = pd.read_csv(in_path)
             l_d = str(fut_df.loc[len(fut_df)-1,'Date'])
             last_date = dt.strptime(l_d,'%Y%m%d')
+        # 逐日迭代
         for d in dir_list:
+            # 排除已經做過的日期以及非工作日
             if d > last_date and cal.is_working_day(d):
+                # 找出每月結算日（第三個星期三）
                 c = calendar.Calendar(firstweekday=calendar.SUNDAY)
                 monthcal = c.monthdatescalendar(d.year,d.month)
                 third_wed = [day for week in monthcal for day in week if day.weekday() == calendar.WEDNESDAY and day.month == d.month][2]
+                # 找出對應的期貨契約（解決每月的換月問題)
                 if d.day > third_wed.day:
                     if d.month == 12:
                         code ='{}{}{}'.format(fut,info_df.loc[1,'code'],str(d.year+1)[3]) #換月
@@ -55,10 +62,13 @@ def future_day_price():
                         code ='{}{}{}'.format(fut,info_df.loc[d.month+1,'code'],str(d.year)[3])
                 else:
                     code ='{}{}{}'.format(fut,info_df.loc[d.month,'code'],str(d.year)[3]) #使用結算日當天契約價格當作現貨價格
+                # 將datetime格式轉為str
                 date = dt.strftime(d,'%Y%m%d')
                 path = f'/home/user/NasHistoryData/FutureCT/{date}/{code}.csv'
+                # 若該期貨商品資料存在
                 if os.path.isfile(path):
                     df1 = pd.read_csv(path)
+                    # 排除開盤前的試搓資料
                     mask = (df1['Time'] >= 84500000000)
                     df1 = df1[mask]
                     opn = 0
