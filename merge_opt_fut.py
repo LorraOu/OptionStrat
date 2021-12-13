@@ -286,11 +286,8 @@ if __name__ == '__main__':
             date_list.append(third_wed)
     data_date = []
     for d in date_list:
-        delta = timedelta(days=7)
-        for i in range(8):
-            temp = d - delta + timedelta(days=i)
-            data_date.append(temp.strftime('%Y%m%d'))
-    data_date = data_date[27:]
+        data_date.append(d.strftime('%Y%m%d'))
+    data_date = data_date[3:]
     # for d in data_date:
     #     create_file(d)
     pool = mp.Pool()
