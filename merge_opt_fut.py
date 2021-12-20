@@ -188,7 +188,12 @@ def create_file(date):
                             opt_crnt[1] = opt_crnt[1]/10
                     merge_df['K'] = opt_crnt[1]
                     t_delta = dt.strptime(str(opt_crnt[2]),'%Y%m%d') - d
-                    merge_df['T'] = t_delta.days/252
+                    # 調整剩餘到期日精確到秒
+                    for i in merge_df.index:
+                        tmp = str(merge_df.loc[i,'Time'])
+                        tmp_d = dt(d.year,d.month,d.day,13,45) - dt(d.year,d.month,d.day,int(tmp[:-10]),int(tmp[-10:-8]))
+                        merge_df.loc[i,'T'] = t_delta.days/252 + tmp_d.seconds/21772800
+                    
                     # 紀錄期貨在結算當天收盤價
                     try:
                         final_s = fut_his_v.loc[str(opt_crnt[2]),'Close']
